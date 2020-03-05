@@ -71,11 +71,11 @@ class MainWindow:
                 self.mouseButtonDown[2] = 1
 
             elif event.button == 4:
-                self.canvasSection.canvas.Magnify(1, self.canvasSection.LocalPosition((self.mouseX, self.mouseY)))
+                self.canvasSection.Magnify(1, self.canvasSection.LocalPosition((self.mouseX, self.mouseY)))
 
             elif event.button == 5:
                 pass
-                self.canvasSection.canvas.Magnify(-1, self.canvasSection.LocalPosition((self.mouseX, self.mouseY)))
+                self.canvasSection.Magnify(-1, self.canvasSection.LocalPosition((self.mouseX, self.mouseY)))
 
         elif event.type == MOUSEBUTTONUP:
             if event.button == 1:
@@ -90,7 +90,7 @@ class MainWindow:
     def LateFeedback(self):
         if self.mouseButtonDown[1]:
             pass
-            self.canvasSection.canvas.Move(
+            self.canvasSection.MoveCanvas(
                 round((self.mouseX - self._mousePreviousX) * self.MOVE_SPEED),
                 round((self.mouseY - self._mousePreviousY) * self.MOVE_SPEED))
 
