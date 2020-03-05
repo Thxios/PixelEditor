@@ -1,6 +1,5 @@
 import pygame as pg
 from pygame.locals import *
-from src.Canvas import Canvas
 from src.Section import CanvasSection
 from src import utility
 
@@ -10,7 +9,7 @@ class MainWindow:
     CANVAS_BG_COLOR = (60, 63, 65)
     CANVAS_BG_COLOR_int = utility.RGBA2INT(CANVAS_BG_COLOR)
     MOVE_SPEED = 1
-    w, h = 1280, 960
+    w, h = 1280, 720
 
     running = False
     screen = None

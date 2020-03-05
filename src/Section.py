@@ -1,11 +1,11 @@
 import pygame as pg
-import numpy as np
-from src.Canvas import Canvas
 from src.Layer import Layer
+from src.Brush import PencilBrush
 from src import utility
 
 
 OUTLINE_COLOR = (255, 255, 255)
+
 
 class Section:
     def __init__(self, x, y, w, h, color):
@@ -17,6 +17,14 @@ class Section:
         self.bgColor = color
         self.surface = pg.Surface((self.w, self.h), pg.SRCALPHA, 32)
         self.surface.fill(self.bgColor)
+        self.sub = []
+
+    def OnClicked(self, button, x, y):
+        if not self.rect.collidepoint(x, y):
+            return
+
+        for sub in self.sub:
+            sub.OnClicked(button, x, y)
 
     def Draw(self, screen):
         self.Update()
@@ -32,10 +40,14 @@ class Section:
 
 
 class CanvasSection(Section):
-    canvas = Canvas.Empty(20, 15)
+    canvasX, canvasY = 0, 0
+    canvasWidth, canvasHeight = 20, 15
+    canvasRect = pg.Rect(canvasX, canvasY, canvasWidth, canvasHeight)
+    magnification = 10
 
     # ----- for test -----
-    pg.draw.circle(canvas.CurrentFrame().layer[0]._surface, (255, 0, 0, 255), (10, 5), 6)
+
+    pencilBrush = PencilBrush()
 
     def __init__(self, x, y, w, h, color):
         super().__init__(x, y, w, h, color)
@@ -43,9 +55,31 @@ class CanvasSection(Section):
         self.bgColorInt = utility.RGBA2INT(color)
         self.bgImage = pg.image.load('data/TransparentBG.png')
 
+    def MoveCanvas(self, dx, dy):
+        self.canvasX += dx
+        self.canvasY += dy
+        self.canvasRect.move_ip(dx, dy)
+
+    def Magnify(self, mag, pivot):
+        if self.magnification + mag < 1:
+            return
+        p_x, p_y = pivot
+        dx = (self.canvasX - p_x) / self.magnification
+        dy = (self.canvasY - p_y) / self.magnification
+        self.magnification += mag
+        new_dx = round(dx * self.magnification)
+        new_dy = round(dy * self.magnification)
+        self.canvasX = new_dx + p_x
+        self.canvasY = new_dy + p_y
+
     def Update(self):
         self.surface.fill(self.bgColor)
-        self.surface.blit(self.bgImage, (self.canvas.x, self.canvas.y), self.canvas.ScreenSpaceResolution())
-        self.surface.blit(self.canvas.GetSurface(), (self.canvas.x, self.canvas.y))
+        self.surface.blit(self.bgImage, (self.canvasX, self.canvasY), self.canvasRect)
+
+    def OnClicked(self, button, x, y):
+        if self.canvasRect.collidepoint(x, y):
+            _clickedPixelX = (x - self.canvasX) // self.magnification
+            _clickedPixelY = (y - self.canvasY) // self.magnification
+            self.pencilBrush.OnMouseDown((_clickedPixelX, _clickedPixelY))
 
 

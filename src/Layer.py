@@ -28,7 +28,7 @@ class Layer:
         self._pixel[x][y] = utility.RGBA2INT(color)
 
     def GetPixel(self, x, y):
-        return self._pixel[x][y]
+        return utility.INT2RGBA(self._pixel[x][y])
 
     def Paste(self, x, y, layer):
         if isinstance(layer, Layer):
