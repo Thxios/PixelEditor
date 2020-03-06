@@ -2,54 +2,80 @@ import pygame as pg
 from src.Layer import Layer
 
 
-class Brush:
-    _layer = None
-
-    def SetCurrentLayer(self, layer: Layer):
-        self._layer = layer
-
-
 class _Brush:
     currentColor = (0, 0, 0, 0)
 
-    _layer = None
-
-    def OnMouseDown(self, clickedPixel):
-        raise NotImplementedError
-
-    def OnDrag(self):
+    def OnMouseDown(self, clickedPixel, layer: Layer):
         pass
 
-    def OnMouseDrag(self, clickedPixel):
+    def OnMouseDrag(self, clickedPixel, layer: Layer):
         pass
 
-    def SetCurrentLayer(self, layer):
-        if isinstance(layer, Layer):
-            self._layer = layer
+    def OnMouseUp(self, clickedPixel, layer: Layer):
+        pass
 
     def SetCurrentColor(self, color):
         self.currentColor = color
 
 
-class PencilBrush(_Brush):
-    def OnMouseDown(self, clickedPixel):
-        self._layer.SetPixel(*clickedPixel, self.currentColor)
+class _PencilBrush(_Brush):
+    def OnMouseDown(self, clickedPixel, layer: Layer):
+        layer.SetPixel(*clickedPixel, self.currentColor)
 
-    def OnMouseDrag(self, clickedPixel):
-        self._layer.SetPixel(*clickedPixel, self.currentColor)
-
-
-class PickerBrush(_Brush):
-    def OnMouseDown(self, clickedPixel):
-        self.currentColor = self._layer.GetPixel(*clickedPixel)
-        return self.currentColor
+    def OnMouseDrag(self, clickedPixel, layer: Layer):
+        layer.SetPixel(*clickedPixel, self.currentColor)
 
 
-class FloodBrush(_Brush):
-    def OnMouseDown(self, clickedPixel):
+class _EraserBrush(_Brush):
+    def OnMouseDown(self, clickedPixel, layer: Layer):
+        layer.SetPixel(*clickedPixel, self.currentColor)
+
+    def OnMouseDrag(self, clickedPixel, layer: Layer):
+        layer.SetPixel(*clickedPixel, self.currentColor)
+
+
+class _FloodBrush(_Brush):
+    def OnMouseDown(self, clickedPixel, layer: Layer):
         pass
 
 
+class _PickerBrush(_Brush):
+    def OnMouseDown(self, clickedPixel, layer: Layer):
+        self.currentColor = layer.GetPixel(*clickedPixel)
+        return self.currentColor
+
+
+class Brush:
+    _layer = None
+
+    pencil = _PencilBrush()
+    eraser = _EraserBrush()
+    flood = _FloodBrush()
+    picker = _PickerBrush()
+
+    _currentBrush: _Brush
+
+    def OnMouseDown(self, clickedPixel):
+        self._currentBrush.OnMouseDown(clickedPixel, self._layer)
+
+    def OnMouseDrag(self, clickedPixel):
+        self._currentBrush.OnMouseDrag(clickedPixel, self._layer)
+
+    def OnMouseUp(self, clickedPixel):
+        self._currentBrush.OnMouseUp(clickedPixel, self._layer)
+
+    def SetBrush(self, brush):
+        if brush == 'Pencil' or brush == 0:
+            self._currentBrush = self.pencil
+        elif brush == 'Eraser' or brush == 1:
+            self._currentBrush = self.eraser
+        elif brush == 'Flood' or brush == 2:
+            self._currentBrush = self.flood
+        elif brush == 'Picker' or brush == 3:
+            self._currentBrush = self.picker
+
+    def SetCurrentLayer(self, layer: Layer):
+        self._layer = layer
+
+
 Brush = Brush()
-PencilBrush = PencilBrush()
-FloodBrush = FloodBrush()

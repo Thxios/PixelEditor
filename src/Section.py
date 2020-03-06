@@ -1,6 +1,6 @@
 import pygame as pg
 from src.Sprite import Sprite
-from src.Brush import PencilBrush
+from src.Brush import Brush
 from math import ceil, floor
 
 
@@ -99,10 +99,12 @@ class CanvasSection(Section):
         )
 
     def OnClicked(self, button, x, y):
+        print(x, y)
         if self.canvas.collidepoint(x, y):
-            _clickedPixelX = (x - self.canvas.x) // self.magnification
-            _clickedPixelY = (y - self.canvas.y) // self.magnification
-            PencilBrush.OnMouseDown((_clickedPixelX, _clickedPixelY))
+            _localX, _localY = self.LocalPosition((x, y))
+            _pixelX = _localX // self.magnification
+            _pixelY = _localY // self.magnification
+            Brush.OnMouseDown((_pixelX, _pixelY))
 
 
 class UISection(Section):

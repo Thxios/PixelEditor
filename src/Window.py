@@ -1,6 +1,7 @@
 import pygame as pg
 from pygame.locals import *
 from src.Section import CanvasSection, UISection
+from src.Brush import Brush
 
 
 class MainWindow:
@@ -23,6 +24,11 @@ class MainWindow:
     mouseButtonDown = [0, 0, 0]
     mouseX, mouseY = 0, 0
     _mousePreviousX, _mousePreviousY = 0, 0
+
+    Brush.SetBrush('Pencil')
+    # ----- for test -----
+    Brush.pencil.SetCurrentColor((255, 255, 255, 255))
+
 
     def Run(self):
         pg.init()
@@ -60,6 +66,9 @@ class MainWindow:
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 self.mouseButtonDown[0] = 1
+
+                # ----- for test -----
+                CanvasSection.OnClicked(1, self.mouseX, self.mouseY)
 
             elif event.button == 2:
                 self.mouseButtonDown[1] = 1
