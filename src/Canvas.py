@@ -5,26 +5,22 @@ from src.Sprite import Sprite
 class Canvas:
     x, y = 0, 0
     w, h = 0, 0
+    rect = pg.Rect(x, y, w, h)
     magnification = 10
 
     frame = []
     currentFrame = 0
 
+    def SetRect(self, x, y, w, h):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.rect = pg.Rect(x, y, w, h)
+
     def Move(self, dx, dy):
         self.x += dx
         self.y += dy
-
-    def Magnify(self, mag, pivot):
-        if self.magnification + mag < 1:
-            return
-        p_x, p_y = pivot
-        dx = (self.x - p_x) / self.magnification
-        dy = (self.y - p_y) / self.magnification
-        self.magnification += mag
-        new_dx = round(dx * self.magnification)
-        new_dy = round(dy * self.magnification)
-        self.x = new_dx + p_x
-        self.y = new_dy + p_y
 
     def CurrentFrame(self):
         return self.frame[self.currentFrame]
