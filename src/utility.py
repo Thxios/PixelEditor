@@ -1,3 +1,5 @@
+from time import time
+
 
 def RGBA2INT(color):
     if len(color) == 4:
@@ -14,3 +16,13 @@ def INT2RGBA(color):
     _r = color // (256 ** 2) % 256
     _a = color // (256 ** 3) % 256
     return _r, _g, _b, _a
+
+
+t = 0
+def TimerStart():
+    global t
+    t = time()
+
+def TimerEnd():
+    d = time() - t
+    print(d, 's')

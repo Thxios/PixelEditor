@@ -11,7 +11,7 @@ class MainWindow:
     running = False
     screen = None
     clock = pg.time.Clock()
-    fps = 125
+    fps = 126
 
     CanvasSection.Setup(320, 0, 960, 960)
     CanvasSection.SetupCanvas(32, 32)
@@ -21,13 +21,13 @@ class MainWindow:
     # ----- for test -----
     # sprite = Canvas.Empty(20, 15, (0, 0, 0, 255))
 
-    mouseButtonDown = [0, 0, 0]
+    mouseButton = [0, 0, 0]
     mouseX, mouseY = 0, 0
     _mousePreviousX, _mousePreviousY = 0, 0
 
     Brush.SetBrush('Pencil')
     # ----- for test -----
-    Brush.pencil.SetCurrentColor((255, 255, 255, 255))
+    Brush.pencil.SetCurrentColor((255, 0, 127, 255))
 
 
     def Run(self):
@@ -65,17 +65,18 @@ class MainWindow:
 
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
-                self.mouseButtonDown[0] = 1
+                self.mouseButton[0] = 1
 
                 # ----- for test -----
-                CanvasSection.OnMouseDown(1, self.mouseX, self.mouseY)
+                if CanvasSection.IsClicked((self.mouseX, self.mouseY)):
+                    CanvasSection.OnMouseDown(1, self.mouseX, self.mouseY)
 
             elif event.button == 2:
-                self.mouseButtonDown[1] = 1
+                self.mouseButton[1] = 1
                 self._mousePreviousX, self._mousePreviousY = self.mouseX, self.mouseY
 
             elif event.button == 3:
-                self.mouseButtonDown[2] = 1
+                self.mouseButton[2] = 1
 
             elif event.button == 4:
                 CanvasSection.Magnify(1, CanvasSection.LocalPosition((self.mouseX, self.mouseY)))
@@ -85,17 +86,19 @@ class MainWindow:
 
         elif event.type == MOUSEBUTTONUP:
             if event.button == 1:
-                self.mouseButtonDown[0] = 0
+                self.mouseButton[0] = 0
 
             elif event.button == 2:
-                self.mouseButtonDown[1] = 0
+                self.mouseButton[1] = 0
 
             elif event.button == 3:
-                self.mouseButtonDown[2] = 0
+                self.mouseButton[2] = 0
 
     def LateFeedback(self):
-        if self.mouseButtonDown[1]:
-            pass
+        if self.mouseButton[0]:
+            if CanvasSection.IsClicked((self.mouseX, self.mouseY)):
+                CanvasSection.OnMouseDrag(1, self.mouseX, self.mouseY)
+        elif self.mouseButton[1]:
             CanvasSection.MoveCanvas(
                 round((self.mouseX - self._mousePreviousX) * self.MOVE_SPEED),
                 round((self.mouseY - self._mousePreviousY) * self.MOVE_SPEED)

@@ -40,7 +40,7 @@ class _FloodBrush(_Brush):
 
 
 class _PickerBrush(_Brush):
-    def OnMouseDown(self, clickedPixel, layer: Layer):
+    def OnMouseDown(self, clickedPixel, layer: Layer) -> (int, int, int, int):
         self.currentColor = layer.GetPixel(*clickedPixel)
         return self.currentColor
 

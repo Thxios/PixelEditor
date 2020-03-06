@@ -348,7 +348,6 @@ def OnMouseLeftDown(m_x, m_y):
             if diff_x <= 18 and diff_y <= 18:
                 if yy * 7 + xx < len(palette):
                     cColor = palette[yy * 7 + xx]
-                    print(cColor)
                     DrawCurrentColor(cColor)
 
         elif code == 'BrushSelect':
@@ -397,7 +396,6 @@ def OnMouseLeftDrag(m_x, m_y):
             ys, ye = max(_p_y - bSize[brushThickness], 0), _p_y + bSize[brushThickness] + 1
             if currentBrush == 0:
                 sArr[xs:xe, ys:ye] = RGBA2Int(cColor)
-                print(RGBA2Int(cColor))
                 UpdateSurfaceArray()
                 # SetPixel(_p_x, _p_y, cColor)
             elif currentBrush == 2:
@@ -455,6 +453,7 @@ pg.display.update()
 # OpenFile()
 # SaveFile()
 
+cnt = 0
 while True:
     keyPressed = pg.key.get_pressed()
     for event in pg.event.get():
@@ -597,3 +596,6 @@ while True:
     pg.display.update(canvasRect)
 
     clock.tick(126)
+    cnt += 1
+    if cnt % 100 == 0:
+        print(clock.get_fps())

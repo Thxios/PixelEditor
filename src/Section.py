@@ -1,7 +1,7 @@
 import pygame as pg
 from src.Sprite import Sprite
 from src.Brush import Brush
-from math import ceil, floor
+from src.utility import TimerStart, TimerEnd
 
 
 class Section:
@@ -29,9 +29,13 @@ class Section:
         self.bgColor = color
 
     def OnMouseDown(self, button, x, y):
-        if not self.rect.collidepoint(x, y):
-            return
-        raise NotImplementedError('For test')
+        pass
+
+    def OnMouseDrag(self, button, x, y):
+        pass
+
+    def OnMouseUp(self, button, x, y):
+        pass
 
     def Changed(self):
         self._hasChange = True
@@ -42,6 +46,9 @@ class Section:
             screen.blit(self.surface, (self.x, self.y))
             pg.draw.rect(screen, self._outlineColor, self.rect, 3)
             self._hasChange = False
+
+    def IsClicked(self, mousePos) -> bool:
+        return self.rect.collidepoint(*mousePos)
 
     def LocalPosition(self, position) -> (int, int):
         _x, _y = position
@@ -56,7 +63,9 @@ class CanvasSection(Section):
     canvasHeight: int
     canvas: pg.Rect
 
-    magnification = 10
+    magnification = 20
+    minMagnification = 1
+    maxMagnification = 20
     bgImage = pg.image.load('data/TransparentBG.png')
     bgColor = (60, 63, 65)
 
@@ -66,13 +75,14 @@ class CanvasSection(Section):
         self.canvasWidth = w
         self.canvasHeight = h
         self.canvas = pg.Rect(0, 0, w * self.magnification, h * self.magnification)
+        self.canvas.center = self.LocalPosition(self.rect.center)
 
     def MoveCanvas(self, dx, dy):
         self.canvas.move_ip(dx, dy)
         self.Changed()
 
     def Magnify(self, mag, pivot):
-        if self.magnification + mag < 1:
+        if self.magnification + mag < self.minMagnification or self.magnification + mag > self.maxMagnification:
             return
         p_x, p_y = pivot
         dx = (self.canvas.x - p_x) / self.magnification
@@ -97,14 +107,45 @@ class CanvasSection(Section):
             pg.transform.scale(self.sprite.GetSurface(), (self.canvas.w, self.canvas.h)),
             self.canvas.topleft
         )
+        # ----- for test -----
+        # TimerStart()
+        # for _ in range(100):
+        #     self.surface.blit(self.bgImage, (self.canvas.x, self.canvas.y), self.canvas)
+        # TimerEnd()
+        # TimerStart()
+        # for _ in range(100):
+        #     self.surface.blit(
+        #         pg.transform.scale(self.sprite.GetSurface(), (self.canvas.w, self.canvas.h)),
+        #         self.canvas.topleft
+        #     )
+        # TimerEnd()
+        # pg.quit()
+        # quit()
+
+    def PositionToPixel(self, x, y) -> (int, int, bool):
+        if self.canvas.collidepoint(x, y):
+            _valid = True
+        else:
+            _valid = False
+        _canvasLocalX, _canvasLocalY = x - self.canvas.x, y - self.canvas.y
+        _pixelX = _canvasLocalX // self.magnification
+        _pixelY = _canvasLocalY // self.magnification
+
+        return _pixelX, _pixelY, _valid
 
     def OnMouseDown(self, button, x, y):
-        print(x, y)
-        if self.canvas.collidepoint(x, y):
-            _localX, _localY = self.LocalPosition((x, y))
-            _pixelX = _localX // self.magnification
-            _pixelY = _localY // self.magnification
+        _localX, _localY = self.LocalPosition((x, y))
+        _pixelX, _pixelY, _valid = self.PositionToPixel(_localX, _localY)
+        if _valid:
             Brush.OnMouseDown((_pixelX, _pixelY))
+            self.Changed()
+
+    def OnMouseDrag(self, button, x, y):
+        _localX, _localY = self.LocalPosition((x, y))
+        _pixelX, _pixelY, _valid = self.PositionToPixel(_localX, _localY)
+        if _valid:
+            Brush.OnMouseDown((_pixelX, _pixelY))
+            self.Changed()
 
 
 class UISection(Section):
