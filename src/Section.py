@@ -1,6 +1,7 @@
 import pygame as pg
-from src.Layer import Layer
+from src.Sprite import Sprite
 from src.Brush import PencilBrush
+from math import ceil, floor
 
 
 class Section:
@@ -30,6 +31,7 @@ class Section:
     def OnClicked(self, button, x, y):
         if not self.rect.collidepoint(x, y):
             return
+        raise NotImplementedError('For test')
 
     def Changed(self):
         self._hasChange = True
@@ -41,7 +43,7 @@ class Section:
             pg.draw.rect(screen, self._outlineColor, self.rect, 3)
             self._hasChange = False
 
-    def LocalPosition(self, position):
+    def LocalPosition(self, position) -> (int, int):
         _x, _y = position
         return _x - self.x, _y - self.y
 
@@ -57,6 +59,8 @@ class CanvasSection(Section):
     magnification = 10
     bgImage = pg.image.load('data/TransparentBG.png')
     bgColor = (60, 63, 65)
+
+    sprite = Sprite.Empty(32, 32)
 
     def SetupCanvas(self, w, h):
         self.canvasWidth = w
@@ -82,9 +86,17 @@ class CanvasSection(Section):
         self.canvas.h = self.canvasHeight * self.magnification
         self.Changed()
 
+    def DisplayArea(self):
+        _xs, _xe = max(0, self.canvas.x), min(self.w, self.canvas.x + self.canvas.w)
+        _ys, _ye = max(0, self.canvas.y), min(self.h, self.canvas.y + self.canvas.h)
+
     def Update(self):
         self.surface.fill(self.bgColor)
         self.surface.blit(self.bgImage, (self.canvas.x, self.canvas.y), self.canvas)
+        self.surface.blit(
+            pg.transform.scale(self.sprite.GetSurface(), (self.canvas.w, self.canvas.h)),
+            self.canvas.topleft
+        )
 
     def OnClicked(self, button, x, y):
         if self.canvas.collidepoint(x, y):

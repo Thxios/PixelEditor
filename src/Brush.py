@@ -3,6 +3,13 @@ from src.Layer import Layer
 
 
 class Brush:
+    _layer = None
+
+    def SetCurrentLayer(self, layer: Layer):
+        self._layer = layer
+
+
+class _Brush:
     currentColor = (0, 0, 0, 0)
 
     _layer = None
@@ -24,7 +31,7 @@ class Brush:
         self.currentColor = color
 
 
-class PencilBrush(Brush):
+class PencilBrush(_Brush):
     def OnMouseDown(self, clickedPixel):
         self._layer.SetPixel(*clickedPixel, self.currentColor)
 
@@ -32,16 +39,17 @@ class PencilBrush(Brush):
         self._layer.SetPixel(*clickedPixel, self.currentColor)
 
 
-class PickerBrush(Brush):
+class PickerBrush(_Brush):
     def OnMouseDown(self, clickedPixel):
         self.currentColor = self._layer.GetPixel(*clickedPixel)
         return self.currentColor
 
 
-class FloodBrush(Brush):
+class FloodBrush(_Brush):
     def OnMouseDown(self, clickedPixel):
         pass
 
 
+Brush = Brush()
 PencilBrush = PencilBrush()
 FloodBrush = FloodBrush()

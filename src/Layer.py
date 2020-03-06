@@ -23,7 +23,7 @@ class Layer:
     def SetPixel(self, x, y, color):
         self._pixel[x][y] = utility.RGBA2INT(color)
 
-    def GetPixel(self, x, y):
+    def GetPixel(self, x, y) -> (int, int, int, int):
         return utility.INT2RGBA(self._pixel[x][y])
 
     def Paste(self, x, y, layer):
@@ -35,7 +35,7 @@ class Layer:
 
             self._pixel[xs:xe, ys:ye] = layer._pixel[crop_xs:crop_xe, crop_ys:crop_ye]
 
-    def Crop(self, xRange, yRange):
+    def CropLayer(self, xRange, yRange):
         _xs, _xe = xRange
         _ys, _ye = yRange
         _xs, _xe = max(_xs, 0), min(_xe, self.w)
@@ -45,10 +45,10 @@ class Layer:
         _layer._pixel = self._pixel[_xs:_xe, _ys:_ye]
         return _layer
 
-    def GetSurface(self):
+    def GetSurface(self) -> pg.Surface:
         return self._surface
 
-    def GetArray(self):
+    def GetArray(self) -> np.ndarray:
         return self._pixel
 
     @staticmethod
@@ -72,6 +72,9 @@ class Layer:
 
     @staticmethod
     def Empty(wid, hei):
-        _layer = Layer(wid, hei)
-        return _layer
+        return Layer(wid, hei)
+
+    @staticmethod
+    def Solid(wid, hei, color):
+        return Layer(wid, hei, color)
 
