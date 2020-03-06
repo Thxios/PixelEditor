@@ -62,9 +62,9 @@ class Sprite:
             self.SetFrame(0)
 
     def GetSurface(self) -> pg.Surface:
-        return self.CurrentFrame().GetSurface()
+        return self._CurrentFrame().GetSurface()
 
-    def CurrentFrame(self) -> _Frame:
+    def _CurrentFrame(self) -> _Frame:
         return self._frame[self._currentFrame]
 
     def CurrentLayer(self) -> Layer:
@@ -74,7 +74,7 @@ class Sprite:
         return self._frameCount
 
     def LayerCount(self) -> int:
-        return self.CurrentFrame().LayerCount()
+        return self._CurrentFrame().LayerCount()
 
     def SetFrame(self, idx):
         if idx < 0 or idx > self._frameCount:
