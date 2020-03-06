@@ -4,29 +4,33 @@ from src.Brush import PencilBrush
 from src import utility
 
 
-OUTLINE_COLOR = (255, 255, 255)
-
-
 class Section:
-    def __init__(self, x, y, w, h, color):
+    x: int
+    y: int
+    w: int
+    h: int
+    bgColor: (int, int, int)
+    rect: pg.Rect
+    surface: pg.Surface
+    _hasChange: bool
+
+    _outlineColor = (255, 255, 255)
+
+    def Setup(self, x, y, w, h):
         self.x = x
         self.y = y
         self.w = w
         self.h = h
-        self.rect = pg.Rect(self.x, self.y, self.w, self.h)
-        self.bgColor = color
-        self.surface = pg.Surface((self.w, self.h), pg.SRCALPHA, 32)
-        self.surface.fill(self.bgColor)
-        self.sub = []
-
+        self.rect = pg.Rect(x, y, w, h)
+        self.surface = pg.Surface((w, h), pg.SRCALPHA, 32)
         self._hasChange = True
+
+    def SetBackgroundColor(self, color):
+        self.bgColor = color
 
     def OnClicked(self, button, x, y):
         if not self.rect.collidepoint(x, y):
             return
-
-        for sub in self.sub:
-            sub.OnClicked(button, x, y)
 
     def Changed(self):
         self._hasChange = True
@@ -35,7 +39,7 @@ class Section:
         if self._hasChange:
             self.Update()
             screen.blit(self.surface, (self.x, self.y))
-            pg.draw.rect(screen, OUTLINE_COLOR, self.rect, 3)
+            pg.draw.rect(screen, self._outlineColor, self.rect, 3)
             self._hasChange = False
 
     def LocalPosition(self, position):
@@ -47,19 +51,18 @@ class Section:
 
 
 class CanvasSection(Section):
+    canvasWidth: int
+    canvasHeight: int
+    canvas: pg.Rect
+
     magnification = 10
-    canvasWidth, canvasHeight = 32, 32
-    canvas = pg.Rect(0, 0, canvasWidth * magnification, canvasHeight * magnification)
+    bgImage = pg.image.load('data/TransparentBG.png')
+    bgColor = (60, 63, 65)
 
-    # ----- for test -----
-
-    pencilBrush = PencilBrush()
-
-    def __init__(self, x, y, w, h, color):
-        super().__init__(x, y, w, h, color)
-
-        self.bgColorInt = utility.RGBA2INT(color)
-        self.bgImage = pg.image.load('data/TransparentBG.png')
+    def SetupCanvas(self, w, h):
+        self.canvasWidth = w
+        self.canvasHeight = h
+        self.canvas = pg.Rect(0, 0, w * self.magnification, h * self.magnification)
 
     def MoveCanvas(self, dx, dy):
         self.canvas.move_ip(dx, dy)
@@ -88,10 +91,13 @@ class CanvasSection(Section):
         if self.canvas.collidepoint(x, y):
             _clickedPixelX = (x - self.canvas.x) // self.magnification
             _clickedPixelY = (y - self.canvas.y) // self.magnification
-            self.pencilBrush.OnMouseDown((_clickedPixelX, _clickedPixelY))
+            PencilBrush.OnMouseDown((_clickedPixelX, _clickedPixelY))
 
 
 class UISection(Section):
-    pass
+    bgColor = (43, 43, 43)
 
+
+CanvasSection = CanvasSection()
+UISection = UISection()
 

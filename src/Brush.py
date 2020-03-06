@@ -36,10 +36,13 @@ class PencilBrush(Brush):
 
 class PickerBrush(Brush):
     def OnMouseDown(self, clickedPixel):
-        self.currentColor = self._layer.GetPixel(clickedPixel)
+        self.currentColor = self._layer.GetPixel(*clickedPixel)
         return self.currentColor
 
 
 class FloodBrush(Brush):
     def OnMouseDown(self, clickedPixel):
         pass
+
+
+PencilBrush = PencilBrush()

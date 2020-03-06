@@ -1,13 +1,9 @@
 import pygame as pg
 from pygame.locals import *
 from src.Section import CanvasSection, UISection
-from src import utility
 
 
 class MainWindow:
-    UI_BG_COLOR = (43, 43, 43)
-    CANVAS_BG_COLOR = (60, 63, 65)
-    CANVAS_BG_COLOR_int = utility.RGBA2INT(CANVAS_BG_COLOR)
     MOVE_SPEED = 1
     w, h = 1280, 960
 
@@ -16,8 +12,10 @@ class MainWindow:
     clock = pg.time.Clock()
     fps = 125
 
-    canvasSection = CanvasSection(320, 0, 960, 960, CANVAS_BG_COLOR)
-    uiSection = UISection(0, 0, 320, 960, UI_BG_COLOR)
+    CanvasSection.Setup(320, 0, 960, 960)
+    CanvasSection.SetupCanvas(32, 32)
+
+    UISection.Setup(0, 0, 320, 960)
 
     # ----- for test -----
     # sprite = Canvas.Empty(20, 15, (0, 0, 0, 255))
@@ -44,8 +42,8 @@ class MainWindow:
             self.LateFeedback()
 
             # ----- for test -----
-            self.canvasSection.Draw(self.screen)
-            self.uiSection.Draw(self.screen)
+            CanvasSection.Draw(self.screen)
+            UISection.Draw(self.screen)
 
             pg.display.update()
             self.clock.tick(self.fps)
@@ -71,10 +69,10 @@ class MainWindow:
                 self.mouseButtonDown[2] = 1
 
             elif event.button == 4:
-                self.canvasSection.Magnify(1, self.canvasSection.LocalPosition((self.mouseX, self.mouseY)))
+                CanvasSection.Magnify(1, CanvasSection.LocalPosition((self.mouseX, self.mouseY)))
 
             elif event.button == 5:
-                self.canvasSection.Magnify(-1, self.canvasSection.LocalPosition((self.mouseX, self.mouseY)))
+                CanvasSection.Magnify(-1, CanvasSection.LocalPosition((self.mouseX, self.mouseY)))
 
         elif event.type == MOUSEBUTTONUP:
             if event.button == 1:
@@ -89,9 +87,10 @@ class MainWindow:
     def LateFeedback(self):
         if self.mouseButtonDown[1]:
             pass
-            self.canvasSection.MoveCanvas(
+            CanvasSection.MoveCanvas(
                 round((self.mouseX - self._mousePreviousX) * self.MOVE_SPEED),
-                round((self.mouseY - self._mousePreviousY) * self.MOVE_SPEED))
+                round((self.mouseY - self._mousePreviousY) * self.MOVE_SPEED)
+            )
 
 
-
+MainWindow = MainWindow()
