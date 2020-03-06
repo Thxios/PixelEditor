@@ -19,6 +19,8 @@ class Section:
         self.surface.fill(self.bgColor)
         self.sub = []
 
+        self._hasChange = True
+
     def OnClicked(self, button, x, y):
         if not self.rect.collidepoint(x, y):
             return
@@ -26,24 +28,28 @@ class Section:
         for sub in self.sub:
             sub.OnClicked(button, x, y)
 
+    def Changed(self):
+        self._hasChange = True
+
     def Draw(self, screen):
-        self.Update()
-        screen.blit(self.surface, (self.x, self.y))
-        pg.draw.rect(screen, OUTLINE_COLOR, self.rect, 3)
+        if self._hasChange:
+            self.Update()
+            screen.blit(self.surface, (self.x, self.y))
+            pg.draw.rect(screen, OUTLINE_COLOR, self.rect, 3)
+            self._hasChange = False
 
     def LocalPosition(self, position):
         _x, _y = position
         return _x - self.x, _y - self.y
 
     def Update(self):
-        raise NotImplementedError()
+        self.surface.fill(self.bgColor)
 
 
 class CanvasSection(Section):
-    canvasX, canvasY = 0, 0
-    canvasWidth, canvasHeight = 20, 15
     magnification = 10
-    canvasRect = pg.Rect(canvasX, canvasY, canvasWidth * magnification, canvasHeight * magnification)
+    canvasWidth, canvasHeight = 32, 32
+    canvas = pg.Rect(0, 0, canvasWidth * magnification, canvasHeight * magnification)
 
     # ----- for test -----
 
@@ -56,32 +62,36 @@ class CanvasSection(Section):
         self.bgImage = pg.image.load('data/TransparentBG.png')
 
     def MoveCanvas(self, dx, dy):
-        self.canvasX += dx
-        self.canvasY += dy
-        self.canvasRect.move_ip(dx, dy)
+        self.canvas.move_ip(dx, dy)
+        self.Changed()
 
     def Magnify(self, mag, pivot):
         if self.magnification + mag < 1:
             return
         p_x, p_y = pivot
-        dx = (self.canvasX - p_x) / self.magnification
-        dy = (self.canvasY - p_y) / self.magnification
+        dx = (self.canvas.x - p_x) / self.magnification
+        dy = (self.canvas.y - p_y) / self.magnification
         self.magnification += mag
         new_dx = round(dx * self.magnification)
         new_dy = round(dy * self.magnification)
-        self.canvasX = new_dx + p_x
-        self.canvasY = new_dy + p_y
-        self.canvasRect.w = self.canvasWidth * self.magnification
-        self.canvasRect.h = self.canvasHeight * self.magnification
+        self.canvas.x = new_dx + p_x
+        self.canvas.y = new_dy + p_y
+        self.canvas.w = self.canvasWidth * self.magnification
+        self.canvas.h = self.canvasHeight * self.magnification
+        self.Changed()
 
     def Update(self):
         self.surface.fill(self.bgColor)
-        self.surface.blit(self.bgImage, (self.canvasX, self.canvasY), self.canvasRect)
+        self.surface.blit(self.bgImage, (self.canvas.x, self.canvas.y), self.canvas)
 
     def OnClicked(self, button, x, y):
-        if self.canvasRect.collidepoint(x, y):
-            _clickedPixelX = (x - self.canvasX) // self.magnification
-            _clickedPixelY = (y - self.canvasY) // self.magnification
+        if self.canvas.collidepoint(x, y):
+            _clickedPixelX = (x - self.canvas.x) // self.magnification
+            _clickedPixelY = (y - self.canvas.y) // self.magnification
             self.pencilBrush.OnMouseDown((_clickedPixelX, _clickedPixelY))
+
+
+class UISection(Section):
+    pass
 
 

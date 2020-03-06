@@ -1,23 +1,23 @@
 import pygame as pg
 from pygame.locals import *
-from src.Section import CanvasSection
+from src.Section import CanvasSection, UISection
 from src import utility
 
 
 class MainWindow:
-    BG_COLOR = (43, 43, 43)
+    UI_BG_COLOR = (43, 43, 43)
     CANVAS_BG_COLOR = (60, 63, 65)
     CANVAS_BG_COLOR_int = utility.RGBA2INT(CANVAS_BG_COLOR)
     MOVE_SPEED = 1
-    w, h = 1280, 720
+    w, h = 1280, 960
 
     running = False
     screen = None
     clock = pg.time.Clock()
     fps = 125
 
-    canvasRect = pg.Rect(320, 0, 960, 960)
     canvasSection = CanvasSection(320, 0, 960, 960, CANVAS_BG_COLOR)
+    uiSection = UISection(0, 0, 320, 960, UI_BG_COLOR)
 
     # ----- for test -----
     # sprite = Canvas.Empty(20, 15, (0, 0, 0, 255))
@@ -43,9 +43,9 @@ class MainWindow:
 
             self.LateFeedback()
 
-            self.screen.fill(self.BG_COLOR)
             # ----- for test -----
             self.canvasSection.Draw(self.screen)
+            self.uiSection.Draw(self.screen)
 
             pg.display.update()
             self.clock.tick(self.fps)
@@ -74,7 +74,6 @@ class MainWindow:
                 self.canvasSection.Magnify(1, self.canvasSection.LocalPosition((self.mouseX, self.mouseY)))
 
             elif event.button == 5:
-                pass
                 self.canvasSection.Magnify(-1, self.canvasSection.LocalPosition((self.mouseX, self.mouseY)))
 
         elif event.type == MOUSEBUTTONUP:
