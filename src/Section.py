@@ -28,7 +28,7 @@ class Section:
     def SetBackgroundColor(self, color):
         self.bgColor = color
 
-    def OnClicked(self, button, x, y):
+    def OnMouseDown(self, button, x, y):
         if not self.rect.collidepoint(x, y):
             return
         raise NotImplementedError('For test')
@@ -98,7 +98,7 @@ class CanvasSection(Section):
             self.canvas.topleft
         )
 
-    def OnClicked(self, button, x, y):
+    def OnMouseDown(self, button, x, y):
         print(x, y)
         if self.canvas.collidepoint(x, y):
             _localX, _localY = self.LocalPosition((x, y))

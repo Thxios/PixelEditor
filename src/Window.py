@@ -68,7 +68,7 @@ class MainWindow:
                 self.mouseButtonDown[0] = 1
 
                 # ----- for test -----
-                CanvasSection.OnClicked(1, self.mouseX, self.mouseY)
+                CanvasSection.OnMouseDown(1, self.mouseX, self.mouseY)
 
             elif event.button == 2:
                 self.mouseButtonDown[1] = 1
