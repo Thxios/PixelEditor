@@ -42,8 +42,8 @@ class Section:
 class CanvasSection(Section):
     canvasX, canvasY = 0, 0
     canvasWidth, canvasHeight = 20, 15
-    canvasRect = pg.Rect(canvasX, canvasY, canvasWidth, canvasHeight)
     magnification = 10
+    canvasRect = pg.Rect(canvasX, canvasY, canvasWidth * magnification, canvasHeight * magnification)
 
     # ----- for test -----
 
@@ -71,6 +71,8 @@ class CanvasSection(Section):
         new_dy = round(dy * self.magnification)
         self.canvasX = new_dx + p_x
         self.canvasY = new_dy + p_y
+        self.canvasRect.w = self.canvasWidth * self.magnification
+        self.canvasRect.h = self.canvasHeight * self.magnification
 
     def Update(self):
         self.surface.fill(self.bgColor)
