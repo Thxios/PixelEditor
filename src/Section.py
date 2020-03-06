@@ -1,7 +1,6 @@
 import pygame as pg
 from src.Layer import Layer
 from src.Brush import PencilBrush
-from src import utility
 
 
 class Section:

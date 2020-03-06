@@ -11,10 +11,17 @@ def End():
     print(time() - t)
 
 
-pg.init()
+class Boo:
+    def DoSomething(self):
+        return
 
-a = pg.Rect(10, 10, 50, 50)
-a.w = 70
-a.h = 100
-print(a)
-print(a.center)
+
+class TestClass:
+    member: [Boo]
+
+    def __init__(self):
+        self.member = []
+
+
+a = TestClass()
+print(a.member)

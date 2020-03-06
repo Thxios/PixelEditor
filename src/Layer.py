@@ -13,10 +13,6 @@ class Layer:
         if color is not None:
             self._surface.fill(color)
         self._pixel = pg.surfarray.pixels2d(self._surface)
-        # _color = utility.RGBA2INT(color)
-        # self._pixel = np.array([
-        #     [_color for _ in range(self.h)] for _ in range(self.w)
-        # ])
 
     def __str__(self):
         return str(self._pixel.T)
@@ -56,42 +52,26 @@ class Layer:
         return self._pixel
 
     @staticmethod
-    def FromArray(array):
-        if isinstance(array, np.ndarray):
+    def FromArray(array: np.ndarray):
+        try:
             _w, _h = array.shape
-            _layer = Layer(_w, _h)
-            _layer._surface = pg.surfarray.make_surface(array)
-            _layer._pixel = pg.surfarray.pixels2d(_layer._surface)
-            return _layer
+        except ValueError:
+            return None
+        _layer = Layer(_w, _h)
+        _layer._surface = pg.surfarray.make_surface(array)
+        _layer._pixel = pg.surfarray.pixels2d(_layer._surface)
+        return _layer
 
     @staticmethod
-    def FromSurface(surface):
-        if isinstance(surface, pg.Surface):
-            _w, _h = surface.get_size()
-            _layer = Layer(_w, _h)
-            _layer._surface = surface
-            _layer._pixel = pg.surfarray.pixels2d(surface)
-            return _layer
+    def FromSurface(surface: pg.Surface):
+        _w, _h = surface.get_size()
+        _layer = Layer(_w, _h)
+        _layer._surface = surface
+        _layer._pixel = pg.surfarray.pixels2d(surface)
+        return _layer
 
+    @staticmethod
+    def Empty(wid, hei):
+        _layer = Layer(wid, hei)
+        return _layer
 
-if __name__ == '__main__':
-    a = np.array([
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-    ])
-    b = np.array([
-        [1, 1, 1, 1],
-        [1, 1, 1, 1],
-        [1, 1, 1, 1],
-    ])
-
-    aa = Layer.FromArray(a)
-    bb = Layer.FromArray(b)
-    print(aa)
-    print(bb)
-    aa.Paste(1, 2, bb)
-    print(aa)

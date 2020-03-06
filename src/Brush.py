@@ -1,5 +1,3 @@
-from abc import ABC
-
 import pygame as pg
 from src.Layer import Layer
 
@@ -46,3 +44,4 @@ class FloodBrush(Brush):
 
 
 PencilBrush = PencilBrush()
+FloodBrush = FloodBrush()
