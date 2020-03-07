@@ -1,6 +1,6 @@
 import pygame as pg
 from pygame.locals import *
-from src.Section import CanvasSection, UISection
+from src.Section import CanvasSection, ColorSection
 from src.Brush import Brush
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -18,7 +18,7 @@ class MainWindow:
     CanvasSection.Setup(320, 0, 960, 960)
     CanvasSection.SetupCanvas(32, 32)
 
-    UISection.Setup(0, 0, 320, 960)
+    ColorSection.Setup(0, 0, 320, 960)
 
     # ----- for test -----
     # sprite = Canvas.Empty(20, 15, (0, 0, 0, 255))
@@ -51,7 +51,7 @@ class MainWindow:
 
             # ----- for test -----
             CanvasSection.Draw(self.screen)
-            UISection.Draw(self.screen)
+            ColorSection.Draw(self.screen)
 
             pg.display.update()
             self.clock.tick(self.fps)
