@@ -46,7 +46,7 @@ class _PickerBrush(_Brush):
 
 
 class Brush:
-    _layer = None
+    _layer: Layer
 
     pencil = _PencilBrush()
     eraser = _EraserBrush()

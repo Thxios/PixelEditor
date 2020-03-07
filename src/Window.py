@@ -15,6 +15,10 @@ class MainWindow:
 
     originX, originY = 200, 800
 
+    Brush.SetBrush('Pencil')
+    # ----- for test -----
+    Brush.pencil.SetCurrentColor((255, 0, 127, 255))
+
     CanvasSection.Setup(originX, 0, w - originX, originY)
     CanvasSection.SetupCanvas(64, 64)
 
@@ -29,10 +33,6 @@ class MainWindow:
     mouseButtonCount = len(mouseButton)
     mouseX, mouseY = 0, 0
     mousePreviousX, mousePreviousY = 0, 0
-
-    Brush.SetBrush('Pencil')
-    # ----- for test -----
-    Brush.pencil.SetCurrentColor((255, 0, 127, 255))
     currentSection = None
 
     def Run(self):
