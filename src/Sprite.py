@@ -7,9 +7,12 @@ class _Frame:
     _layer = []
     _layerCount = 0
 
+    surface = pg.Surface
+
     def __init__(self, wid, hei):
         self.w = wid
         self.h = hei
+        self.surface = pg.Surface((wid, hei), pg.SRCALPHA, 32)
 
     def AddLayer(self, layer: Layer):
         self._layer.append(layer)
@@ -30,10 +33,10 @@ class _Frame:
         return self._layer[idx]
 
     def GetSurface(self) -> pg.Surface:
-        _surface = pg.Surface((self.w, self.h), pg.SRCALPHA, 32)
+        self.surface.fill((0, 0, 0, 0))
         for _layer in self._layer:
-            pg.surfarray.blit_array(_surface, _layer.GetArray())
-        return _surface
+            pg.surfarray.blit_array(self.surface, _layer.GetArray())
+        return self.surface
 
     def LayerCount(self) -> int:
         return self._layerCount
@@ -46,6 +49,8 @@ class _Frame:
 
 
 class Sprite:
+    surface: pg.Surface
+
     _frame = []
     _currentFrame = 0
     _frameCount = 0
@@ -62,9 +67,12 @@ class Sprite:
             self.SetFrame(0)
 
     def GetSurface(self) -> pg.Surface:
-        return self._CurrentFrame().GetSurface()
+        if Brush.LayerChanged():
+            self.surface = self.CurrentFrame().GetSurface()
+            Brush.LayerApplied()
+        return self.surface
 
-    def _CurrentFrame(self) -> _Frame:
+    def CurrentFrame(self) -> _Frame:
         return self._frame[self._currentFrame]
 
     def CurrentLayer(self) -> Layer:
@@ -74,7 +82,7 @@ class Sprite:
         return self._frameCount
 
     def LayerCount(self) -> int:
-        return self._CurrentFrame().LayerCount()
+        return self.CurrentFrame().LayerCount()
 
     def SetFrame(self, idx):
         if idx < 0 or idx > self._frameCount:

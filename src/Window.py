@@ -61,9 +61,9 @@ class MainWindow:
 
             self.clock.tick(self.fps)
 
-            cnt += 1
-            if cnt % 200 == 0:
-                print(self.clock.get_fps())
+            # cnt += 1
+            # if cnt % 200 == 0:
+            #     print(self.clock.get_fps())
 
     def GetMouseSection(self):
         if CanvasSection.IsClicked((self.mouseX, self.mouseY)):

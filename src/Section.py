@@ -71,14 +71,17 @@ class CanvasSection(Section):
     canvasHeight: int
     canvas: pg.Rect
     sprite: Sprite
-    background: pg.Surface
+    canvasSurface: pg.Surface
+    backgroundOriginal: pg.Surface
+    background = pg.Surface
 
     magnification = 10
     minMagnification = 1
-    maxMagnification = 20
-    bgImage = pg.image.load('data/TransparentBG.png')
+    maxMagnification = 25
     bgColor = (60, 63, 65)
     canvasOutlineWidth = 2
+    # ----- for test -----
+    first = None
 
     def SetupCanvas(self, w, h):
         self.sprite = Sprite.Empty(w, h)
@@ -86,14 +89,16 @@ class CanvasSection(Section):
         self.canvasHeight = h
         self.canvas = pg.Rect(0, 0, w * self.magnification, h * self.magnification)
         self.canvas.center = self.LocalPosition(self.rect.center)
+        self.canvasSurface = self.sprite.GetSurface()
 
-        self.background = pg.Surface((self.canvasWidth, self.canvasHeight), pg.SRCALPHA, 32)
+        self.backgroundOriginal = pg.Surface((self.canvasWidth, self.canvasHeight), pg.SRCALPHA, 32)
         for _x in range(ceil(self.canvasWidth / _tileSize)):
             for _y in range(ceil(self.canvasHeight / _tileSize)):
                 if (_x + _y) % 2:
-                    self.background.blit(_gray1, (_x * _tileSize, _y * _tileSize))
+                    self.backgroundOriginal.blit(_gray1, (_x * _tileSize, _y * _tileSize))
                 else:
-                    self.background.blit(_gray2, (_x * _tileSize, _y * _tileSize))
+                    self.backgroundOriginal.blit(_gray2, (_x * _tileSize, _y * _tileSize))
+        self.background = pg.transform.scale(self.backgroundOriginal, self.canvas.size)
 
     def SetCanvasPosition(self, x, y):
         _x = max(min(x, self.w - self.canvas.w), 0)
@@ -122,6 +127,7 @@ class CanvasSection(Section):
         self.canvas.y = new_dy + p_y
         self.canvas.w = self.canvasWidth * self.magnification
         self.canvas.h = self.canvasHeight * self.magnification
+        self.background = pg.transform.scale(self.backgroundOriginal, self.canvas.size)
         self.Changed()
 
     def DisplayArea(self):
@@ -136,16 +142,20 @@ class CanvasSection(Section):
                                                self.canvas.w + 2 * self.canvasOutlineWidth,
                                                self.canvas.h + 2 * self.canvasOutlineWidth),
                      1)
-        self.surface.blit(pg.transform.scale(self.background, self.canvas.size), self.canvas.topleft)
+        self.surface.blit(self.background, self.canvas.topleft)
         self.surface.blit(pg.transform.scale(self.sprite.GetSurface(), self.canvas.size), self.canvas.topleft)
         # ----- for test -----
         # TimerStart()
         # for _ in range(100):
-        #     self.surface.blit(self.bgImage, (self.canvas.x, self.canvas.y), self.canvas)  # 0.8595s
+        #     _toScale = self.sprite.GetSurface()
         # TimerEnd()
         # TimerStart()
         # for _ in range(100):
-        #     _toBlit = pg.transform.scale(self.sprite.GetSurface(), (self.canvas.w, self.canvas.h))  # 0.3578s
+        #     _toBlit = pg.transform.scale(_toScale, (self.canvas.w, self.canvas.h))  # 0.3578s
+        # TimerEnd()
+        # TimerStart()
+        # for _ in range(100):
+        #     _temp = pg.transform.rotozoom(_toScale, 0, self.magnification)
         # TimerEnd()
         # TimerStart()
         # for _ in range(100):
@@ -168,11 +178,19 @@ class CanvasSection(Section):
     def OnMouseDown(self, button, x, y):
         if button == 1:
             pass
-            # _localX, _localY = self.LocalPosition((x, y))
-            # _pixelX, _pixelY, _valid = self.PositionToPixel(_localX, _localY)
+            _localX, _localY = self.LocalPosition((x, y))
+            _pixelX, _pixelY, _valid = self.PositionToPixel(_localX, _localY)
             # if _valid:
             #     Brush.OnMouseDown((_pixelX, _pixelY))
             #     self.Changed()
+
+            # ----- for test -----
+            if _valid:
+                if self.first is None:
+                    self.first = (_pixelX, _pixelY)
+                else:
+                    Brush.DrawLine(*self.first, _pixelX, _pixelY)
+                    self.first = None
         elif button == 4:
             self.Magnify(1, self.LocalPosition((x, y)))
         elif button == 5:
