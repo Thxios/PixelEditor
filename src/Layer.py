@@ -9,6 +9,7 @@ class Layer:
         self.h = hei
         self.resolution = (self.w, self.h)
         self._surface = pg.Surface((wid, hei), pg.SRCALPHA, 32)
+        self._hasChange = True
 
         if color is not None:
             self._surface.fill(color)
@@ -19,9 +20,12 @@ class Layer:
 
     def Clear(self):
         self._pixel = np.zeros((self.w, self.h))
+        self._hasChange = True
 
     def SetPixel(self, x, y, color):
-        self._pixel[x][y] = utility.RGBA2INT(color)
+        if self._pixel[x][y] != utility.RGBA2INT(color):
+            self._pixel[x][y] = utility.RGBA2INT(color)
+            self._hasChange = True
 
     def GetPixel(self, x, y) -> (int, int, int, int):
         return utility.INT2RGBA(self._pixel[x][y])
@@ -34,6 +38,7 @@ class Layer:
             crop_xe, crop_ye = min(self.w - x, layer.w), min(self.h - y, layer.h)
 
             self._pixel[xs:xe, ys:ye] = layer._pixel[crop_xs:crop_xe, crop_ys:crop_ye]
+            self._hasChange = True
 
     def CropLayer(self, xRange, yRange):
         _xs, _xe = xRange
@@ -50,6 +55,12 @@ class Layer:
 
     def GetArray(self) -> np.ndarray:
         return self._pixel
+
+    def IsChanged(self):
+        return self._hasChange
+
+    def Applied(self):
+        self._hasChange = False
 
     @staticmethod
     def FromArray(array: np.ndarray):
