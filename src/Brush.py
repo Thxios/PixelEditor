@@ -85,30 +85,48 @@ class Brush:
 
     # ----- for test -----
     def DrawLine(self, x0, y0, x1, y1):
+        # print('draw', (x0, y0), (x1, y1))
+        dx = x1 - x0
+        dy = y1 - y0
+        ab = 1 if dy > 0 else -1
+        if dx == 0:
+            for y in range(y0, y1 + ab, ab):
+                self.pencil.OnMouseDown((x0, y), self._layer)
+            return
         if x0 > x1:
             x0, x1 = x1, x0
             y0, y1 = y1, y0
-        print(' ')
-        print((x0, y0), (x1, y1))
-        dx = x1 - x0
-        dy = y1 - y0 - 1
+            dy = -dy
+            ab = -ab
+        # print(' ')
+        # print((x0, y0), (x1, y1))
         slope = abs(dy / dx)
-        print(dx, dy)
-        print(slope)
-        ab = 1 if dy > 0 else -1
+        # print(dx, dy)
+        # print(slope)
         error = 0
-        y = y0
-        for x in range(x0, x1 + 1):
-            print('x:', x)
-            self.pencil.OnMouseDown((x, y), self._layer)
-            print((x, y))
-            error += slope
-            while error >= 0.5:
-                error -= 1
+        if slope < 1:
+            y = y0
+            for x in range(x0, x1 + 1):
+                # print((x, y), error)
                 self.pencil.OnMouseDown((x, y), self._layer)
-                print((x, y))
-                if y != y1:
+                error += slope
+                if error > 0.5:
+                    error -= 1
+                    self.pencil.OnMouseDown((x, y), self._layer)
+                    # print((x, y), error)
                     y += ab
+        else:
+            slope = 1 / slope
+            x = x0
+            for y in range(y0, y1 + ab, ab):
+                self.pencil.OnMouseDown((x, y), self._layer)
+                # print((x, y), error)
+                error += slope
+                if error > 0.5:
+                    error -= 1
+                    # print((x, y), error)
+                    self.pencil.OnMouseDown((x, y), self._layer)
+                    x += 1
             # if error > 0.5:
             #     for _ in [0] * int(error - 0.5):
             #         self.pencil.OnMouseDown((x, y), self._layer)
