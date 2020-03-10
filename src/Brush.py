@@ -98,7 +98,7 @@ class Brush:
         ab = 1 if dy > 0 else -1
         error = 0
         y = y0
-        for x in range(x0, x1 + 1):
+        for x in range(x0 + 1, x1 + 1):
             print('x:', x)
             self.pencil.OnMouseDown((x, y), self._layer)
             print((x, y))
