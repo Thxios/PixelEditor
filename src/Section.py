@@ -80,8 +80,6 @@ class CanvasSection(Section):
     maxMagnification = 25
     bgColor = (60, 63, 65)
     canvasOutlineWidth = 2
-    # ----- for test -----
-    first = None
 
     def SetupCanvas(self, w, h):
         self.sprite = Sprite.Empty(w, h)
@@ -178,19 +176,11 @@ class CanvasSection(Section):
     def OnMouseDown(self, button, x, y):
         if button == 1:
             pass
-            _localX, _localY = self.LocalPosition((x, y))
-            _pixelX, _pixelY, _valid = self.PositionToPixel(_localX, _localY)
+            # _localX, _localY = self.LocalPosition((x, y))
+            # _pixelX, _pixelY, _valid = self.PositionToPixel(_localX, _localY)
             # if _valid:
             #     Brush.OnMouseDown((_pixelX, _pixelY))
             #     self.Changed()
-
-            # ----- for test -----
-            if _valid:
-                if self.first is None:
-                    self.first = (_pixelX, _pixelY)
-                else:
-                    Brush.DrawLine(*self.first, _pixelX, _pixelY)
-                    self.first = None
         elif button == 4:
             self.Magnify(1, self.LocalPosition((x, y)))
         elif button == 5:
@@ -198,10 +188,13 @@ class CanvasSection(Section):
 
     def OnMouseDrag(self, button, x, y, _x, _y):
         if button == 1:
-            _localX, _localY = self.LocalPosition((x, y))
-            _pixelX, _pixelY, _valid = self.PositionToPixel(_localX, _localY)
-            if _valid:
-                Brush.OnMouseDown((_pixelX, _pixelY))
+            _pixelX, _pixelY, _valid = self.PositionToPixel(*self.LocalPosition((x, y)))
+            _prePixelX, _prePixelY, _preValid = self.PositionToPixel(*self.LocalPosition((_x, _y)))
+            if _valid and _preValid:
+                if abs(_prePixelX - _pixelX) > 1 or abs(_prePixelY - _pixelY) > 1:
+                    Brush.DrawLine(_prePixelX, _prePixelY, _pixelX, _pixelY)
+                else:
+                    Brush.OnMouseDown((_pixelX, _pixelY))
                 self.Changed()
         elif button == 2:
             self.MoveCanvas(x - _x, y - _y)
