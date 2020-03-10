@@ -5,7 +5,7 @@ from src.Brush import Brush
 
 
 class MainWindow:
-    w, h = 1600, 900
+    w, h = 1280, 720
     bgColor = (78, 82, 84)
 
     running = False
@@ -13,7 +13,7 @@ class MainWindow:
     clock = pg.time.Clock()
     fps = 126
 
-    originX, originY = 200, 600
+    originX, originY = 200, h - 250
 
     Brush.SetBrush('Pencil')
     # ----- for test -----
