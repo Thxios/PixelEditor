@@ -1,8 +1,8 @@
 import pygame as pg
 from src.Sprite import Sprite
 from src.Brush import Brush
-from math import ceil
-from src.utility import TimerStart, TimerEnd
+from math import ceil, sin, cos, atan2, radians, degrees
+from src import utility
 
 _tileSize = 32
 _gray1 = pg.Surface((_tileSize, _tileSize), pg.SRCALPHA, 32)
@@ -16,6 +16,8 @@ class Section:
     y: int
     w: int
     h: int
+    centerX: int
+    centerY: int
     bgColor: (int, int, int)
     rect: pg.Rect
     surface: pg.Surface
@@ -29,6 +31,8 @@ class Section:
         self.y = y + self.term
         self.w = w - self.term * 2
         self.h = h - self.term * 2
+        self.centerX = self.w // 2
+        self.centerY = self.h // 2
         self.rect = pg.Rect(self.x, self.y, self.w, self.h)
         self.surface = pg.Surface((self.w, self.h), pg.SRCALPHA, 32)
         self._hasChange = True
@@ -208,9 +212,50 @@ class FrameSection(Section):
     bgColor = (32, 32, 32)
 
 
-class ColorSection(Section):
-    bgColor = (43, 43, 43)
 
+R, G, B = 0, 1, 2
+H, S, V = 0, 1, 2
+
+class ColorSection(Section):
+    colorCenterX: int
+    colorCenterY: int
+
+    bgColor = (43, 43, 43)
+    colorWheelImage = pg.image.load('data/hue.png')
+    radius = colorWheelImage.get_width() // 2
+    upperTerm = 15
+    colorRGB = (190, 49, 83)
+    colorHSV = utility.RGB2HSV(colorRGB)
+    print(colorRGB, colorHSV)
+    dotImage = pg.image.load('data/dot.png')
+    dotRadius = dotImage.get_width() // 2
+
+    # ----- for test -----
+    wheelCenterX = 125
+    wheelCenterY = 120
+
+    def Update(self):
+        self.surface.fill(self.bgColor)
+        self.surface.blit(self.colorWheelImage, (self.centerX - self.radius, self.upperTerm))
+        self.DrawColor()
+
+    def SetColor(self, color: (int, int, int)):
+        if len(color) == 4:
+            _r, _g, _b, _ = color
+        else:
+            _r, _g, _b = color
+        self.colorRGB = (_r, _g, _b)
+        self.colorHSV = utility.RGB2HSV(self.colorRGB)
+        self.Changed()
+
+    def DrawColor(self):
+        _theta = radians(90 - self.colorHSV[H])
+        _x = round(cos(_theta) * self.radius * self.colorHSV[S] / 100)
+        _y = round(sin(_theta) * self.radius * self.colorHSV[S] / 100)
+        print(_theta, _x, _y)
+        self.surface.blit(self.colorWheelImage, (self.centerX - self.radius, self.upperTerm))
+        self.surface.blit(self.dotImage,
+                          (self.wheelCenterX + _x - self.dotRadius, self.wheelCenterY + _y - self.dotRadius))
 
 CanvasSection = CanvasSection()
 PaletteSection = PaletteSection()

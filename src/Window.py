@@ -5,7 +5,7 @@ from src.Brush import Brush
 
 
 class MainWindow:
-    w, h = 1280, 720
+    w, h = 1600, 960
     bgColor = (78, 82, 84)
 
     running = False
@@ -13,7 +13,7 @@ class MainWindow:
     clock = pg.time.Clock()
     fps = 126
 
-    originX, originY = 200, h - 250
+    originX, originY = 250, h - 200
 
     Brush.SetBrush('Pencil')
     # ----- for test -----
@@ -22,9 +22,9 @@ class MainWindow:
     CanvasSection.Setup(originX, 0, w - originX, originY)
     CanvasSection.SetupCanvas(64, 64)
 
-    PaletteSection.Setup(0, 0, originX, originY)
+    PaletteSection.Setup(0, 0, originX, originY - 200)
     FrameSection.Setup(originX, originY, w - originX, h - originY)
-    ColorSection.Setup(0, originY, originX, h - originY)
+    ColorSection.Setup(0, originY - 200, originX, h - originY + 200)
 
     # ----- for test -----
     # sprite = Canvas.Empty(20, 15, (0, 0, 0, 255))

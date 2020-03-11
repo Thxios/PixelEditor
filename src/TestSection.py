@@ -5,7 +5,7 @@ from src.Section import ColorSection
 section = ColorSection
 pg.init()
 
-w, h = 200, 250
+w, h = 250, 400
 section.Setup(0, 0, w, h)
 
 screen = pg.display.set_mode((w, h))
