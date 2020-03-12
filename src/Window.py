@@ -17,8 +17,6 @@ class MainWindow:
     _diff = 200
 
     Brush.SetBrush('Pencil')
-    # ----- for test -----
-    Brush.pencil.SetCurrentColor((255, 0, 127, 255))
 
     CanvasSection.Setup(originX, 0, w - originX, originY)
     CanvasSection.SetupCanvas(64, 64)
@@ -112,6 +110,7 @@ class MainWindow:
         elif event.type == MOUSEBUTTONUP:
             if event.button < len(self.mouseButton):
                 self.mouseButton[event.button] = 0
+            self.currentSection.OnMouseUp(event.button, self.mouseX, self.mouseY)
 
     def LateFeedback(self):
         for _button in range(1, self.mouseButtonCount):

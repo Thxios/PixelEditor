@@ -14,6 +14,8 @@ preX, preY = 0, 0
 
 mouse = [0, 0, 0, 0]
 
+clock = pg.time.Clock()
+
 while 1:
     preX, preY = mouseX, mouseY
     mouseX, mouseY = pg.mouse.get_pos()
@@ -39,3 +41,4 @@ while 1:
 
 
     section.Draw(screen)
+    clock.tick(126)

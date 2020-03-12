@@ -32,6 +32,8 @@ def RGB2HSV(color: (int, int, int)) -> (float, float, float):
 
 def HSV2RGB(color: (float, float, float)) -> (int, int, int):
     _h, _s, _v = color
+    if _h < 0:
+        raise TypeError('Hue value is invalid')
     _r, _g, _b = colorsys.hsv_to_rgb(_h / 360, _s / 100, _v / 100)
     return round(_r * 255), round(_g * 255), round(_b * 255)
 

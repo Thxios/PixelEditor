@@ -6,8 +6,6 @@ class Section:
     y: int
     w: int
     h: int
-    centerX: int
-    centerY: int
     bgColor: (int, int, int)
     rect: pg.Rect
     surface: pg.Surface
@@ -21,8 +19,6 @@ class Section:
         self.y = y + self.term
         self.w = w - self.term * 2
         self.h = h - self.term * 2
-        self.centerX = self.w // 2
-        self.centerY = self.h // 2
         self.rect = pg.Rect(self.x, self.y, self.w, self.h)
         self.surface = pg.Surface((self.w, self.h), pg.SRCALPHA, 32)
         self._hasChange = True
