@@ -1,6 +1,6 @@
 import pygame as pg
 from pygame.locals import *
-from src.Section import CanvasSection, ColorSection
+from src.Section.Section import CanvasSection, ColorSection
 from src.Brush import Brush
 from OpenGL.GL import *
 from OpenGL.GLU import *

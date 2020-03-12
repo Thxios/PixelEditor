@@ -1,73 +1,8 @@
 import pygame as pg
-from src.Sprite import Sprite
+from src.Section._Section import Section
 from src.Brush import Brush
-from math import ceil, sin, cos, atan2, radians, degrees
-from src import utility
-
-_tileSize = 32
-_gray1 = pg.Surface((_tileSize, _tileSize), pg.SRCALPHA, 32)
-_gray2 = pg.Surface((_tileSize, _tileSize), pg.SRCALPHA, 32)
-_gray1.fill((127, 127, 127, 255))
-_gray2.fill((192, 192, 192, 255))
-
-
-class Section:
-    x: int
-    y: int
-    w: int
-    h: int
-    centerX: int
-    centerY: int
-    bgColor: (int, int, int)
-    rect: pg.Rect
-    surface: pg.Surface
-    _hasChange: bool
-
-    _outlineColor = (255, 255, 255)
-    term = 5
-
-    def Setup(self, x, y, w, h):
-        self.x = x + self.term
-        self.y = y + self.term
-        self.w = w - self.term * 2
-        self.h = h - self.term * 2
-        self.centerX = self.w // 2
-        self.centerY = self.h // 2
-        self.rect = pg.Rect(self.x, self.y, self.w, self.h)
-        self.surface = pg.Surface((self.w, self.h), pg.SRCALPHA, 32)
-        self._hasChange = True
-
-    def SetBackgroundColor(self, color):
-        self.bgColor = color
-
-    def OnMouseDown(self, button, x, y):
-        pass
-
-    def OnMouseDrag(self, button, x, y, _x, _y):
-        pass
-
-    def OnMouseUp(self, button, x, y):
-        pass
-
-    def Changed(self):
-        self._hasChange = True
-
-    def Draw(self, screen):
-        if self._hasChange:
-            self.Update()
-            screen.blit(self.surface, (self.x, self.y))
-            pg.display.update(pg.draw.rect(screen, self._outlineColor, self.rect, 3))
-            self._hasChange = False
-
-    def IsClicked(self, mousePos) -> bool:
-        return self.rect.collidepoint(*mousePos)
-
-    def LocalPosition(self, position) -> (int, int):
-        _x, _y = position
-        return _x - self.x, _y - self.y
-
-    def Update(self):
-        self.surface.fill(self.bgColor)
+from src.Sprite import Sprite
+from math import ceil
 
 
 class CanvasSection(Section):
@@ -85,6 +20,12 @@ class CanvasSection(Section):
     bgColor = (60, 63, 65)
     canvasOutlineWidth = 2
 
+    tileSize = 32
+    _gray1 = pg.Surface((tileSize, tileSize), pg.SRCALPHA, 32)
+    _gray2 = pg.Surface((tileSize, tileSize), pg.SRCALPHA, 32)
+    _gray1.fill((127, 127, 127, 255))
+    _gray2.fill((192, 192, 192, 255))
+
     def SetupCanvas(self, w, h):
         self.sprite = Sprite.Empty(w, h)
         self.canvasWidth = w
@@ -94,12 +35,12 @@ class CanvasSection(Section):
         self.canvasSurface = self.sprite.GetSurface()
 
         self.backgroundOriginal = pg.Surface((self.canvasWidth, self.canvasHeight), pg.SRCALPHA, 32)
-        for _x in range(ceil(self.canvasWidth / _tileSize)):
-            for _y in range(ceil(self.canvasHeight / _tileSize)):
+        for _x in range(ceil(self.canvasWidth / self.tileSize)):
+            for _y in range(ceil(self.canvasHeight / self.tileSize)):
                 if (_x + _y) % 2:
-                    self.backgroundOriginal.blit(_gray1, (_x * _tileSize, _y * _tileSize))
+                    self.backgroundOriginal.blit(self._gray1, (_x * self.tileSize, _y * self.tileSize))
                 else:
-                    self.backgroundOriginal.blit(_gray2, (_x * _tileSize, _y * _tileSize))
+                    self.backgroundOriginal.blit(self._gray2, (_x * self.tileSize, _y * self.tileSize))
         self.background = pg.transform.scale(self.backgroundOriginal, self.canvas.size)
 
     def SetCanvasPosition(self, x, y):
@@ -118,7 +59,8 @@ class CanvasSection(Section):
         if self.canvas.collidepoint(*pivot):
             p_x, p_y = pivot
         else:
-            p_x, p_y = self.canvas.center
+            p_x = max(min(pivot[0], self.canvas.x + self.canvas.w), self.canvas.x)
+            p_y = max(min(pivot[1], self.canvas.y + self.canvas.h), self.canvas.y)
         dx = (self.canvas.x - p_x) / self.magnification
         dy = (self.canvas.y - p_y) / self.magnification
         self.magnification += mag
@@ -178,6 +120,7 @@ class CanvasSection(Section):
         return _pixelX, _pixelY, _valid
 
     def OnMouseDown(self, button, x, y):
+        x, y = self.LocalPosition((x, y))
         if button == 1:
             pass
             # _localX, _localY = self.LocalPosition((x, y))
@@ -186,14 +129,16 @@ class CanvasSection(Section):
             #     Brush.OnMouseDown((_pixelX, _pixelY))
             #     self.Changed()
         elif button == 4:
-            self.Magnify(1, self.LocalPosition((x, y)))
+            self.Magnify(1, (x, y))
         elif button == 5:
-            self.Magnify(-1, self.LocalPosition((x, y)))
+            self.Magnify(-1, (x, y))
 
     def OnMouseDrag(self, button, x, y, _x, _y):
+        x, y = self.LocalPosition((x, y))
+        _x, _y = self.LocalPosition((_x, _y))
         if button == 1:
-            _pixelX, _pixelY, _valid = self.PositionToPixel(*self.LocalPosition((x, y)))
-            _prePixelX, _prePixelY, _preValid = self.PositionToPixel(*self.LocalPosition((_x, _y)))
+            _pixelX, _pixelY, _valid = self.PositionToPixel(x, y)
+            _prePixelX, _prePixelY, _preValid = self.PositionToPixel(_x, _y)
             if _valid and _preValid:
                 if abs(_prePixelX - _pixelX) > 1 or abs(_prePixelY - _pixelY) > 1:
                     Brush.DrawLine(_prePixelX, _prePixelY, _pixelX, _pixelY)
@@ -203,62 +148,3 @@ class CanvasSection(Section):
         elif button == 2:
             self.MoveCanvas(x - _x, y - _y)
 
-
-class PaletteSection(Section):
-    bgColor = (43, 43, 43)
-
-
-class FrameSection(Section):
-    bgColor = (32, 32, 32)
-
-
-
-R, G, B = 0, 1, 2
-H, S, V = 0, 1, 2
-
-class ColorSection(Section):
-    colorCenterX: int
-    colorCenterY: int
-
-    bgColor = (43, 43, 43)
-    colorWheelImage = pg.image.load('data/hue.png')
-    radius = colorWheelImage.get_width() // 2
-    upperTerm = 15
-    colorRGB = (190, 49, 83)
-    colorHSV = utility.RGB2HSV(colorRGB)
-    print(colorRGB, colorHSV)
-    dotImage = pg.image.load('data/dot.png')
-    dotRadius = dotImage.get_width() // 2
-
-    # ----- for test -----
-    wheelCenterX = 125
-    wheelCenterY = 120
-
-    def Update(self):
-        self.surface.fill(self.bgColor)
-        self.surface.blit(self.colorWheelImage, (self.centerX - self.radius, self.upperTerm))
-        self.DrawColor()
-
-    def SetColor(self, color: (int, int, int)):
-        if len(color) == 4:
-            _r, _g, _b, _ = color
-        else:
-            _r, _g, _b = color
-        self.colorRGB = (_r, _g, _b)
-        self.colorHSV = utility.RGB2HSV(self.colorRGB)
-        self.Changed()
-
-    def DrawColor(self):
-        _theta = radians(90 - self.colorHSV[H])
-        _x = round(cos(_theta) * self.radius * self.colorHSV[S] / 100)
-        _y = round(sin(_theta) * self.radius * self.colorHSV[S] / 100)
-        print(_theta, _x, _y)
-        self.surface.blit(self.colorWheelImage, (self.centerX - self.radius, self.upperTerm))
-        self.surface.blit(self.dotImage,
-                          (self.wheelCenterX + _x - self.dotRadius, self.wheelCenterY + _y - self.dotRadius))
-
-CanvasSection = CanvasSection()
-PaletteSection = PaletteSection()
-FrameSection = FrameSection()
-ColorSection = ColorSection()
-Empty = Section()

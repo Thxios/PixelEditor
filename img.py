@@ -9,5 +9,5 @@ for x in range(w):
         if pixel[x, y] == (0, 0, 0, 255):
             pixel[x, y] = (0, 0, 0, 0)
 
-img.thumbnail((201, 201))
-img.save('newDa/hue3.png')
+img.thumbnail((201 + 6, 201 + 6))
+img.save('newDa/hue4.png')

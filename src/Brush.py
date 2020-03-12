@@ -15,7 +15,12 @@ class _Brush:
         pass
 
     def SetCurrentColor(self, color):
-        self.currentColor = color
+        if len(color) == 3:
+            _r, _g, _b = color
+            _a = 255
+        else:
+            _r, _g, _b, _a = color
+        self.currentColor = (_r, _g, _b, _a)
 
 
 class _PencilBrush(_Brush):

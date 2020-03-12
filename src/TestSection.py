@@ -1,5 +1,5 @@
 import pygame as pg
-from src.Section import ColorSection
+from src.Section.Section import ColorSection
 
 
 section = ColorSection
@@ -10,14 +10,32 @@ section.Setup(0, 0, w, h)
 
 screen = pg.display.set_mode((w, h))
 mouseX, mouseY = 0, 0
+preX, preY = 0, 0
+
+mouse = [0, 0, 0, 0]
 
 while 1:
+    preX, preY = mouseX, mouseY
     mouseX, mouseY = pg.mouse.get_pos()
     for e in pg.event.get():
         if e.type == pg.QUIT:
             pg.quit()
             quit()
+
         elif e.type == pg.MOUSEBUTTONDOWN:
             section.OnMouseDown(e.button, mouseX, mouseY)
+            if e.button < 3:
+                mouse[e.button] = 1
+                preX, preY = mouseX, mouseY
+
+        elif e.type == pg.MOUSEBUTTONUP:
+            section.OnMouseUp(e.button, mouseX, mouseY)
+            if e.button < 3:
+                mouse[e.button] = 0
+
+    for i in range(1, len(mouse)):
+        if mouse[i]:
+            section.OnMouseDrag(i, mouseX, mouseY, preX, preY)
+
 
     section.Draw(screen)

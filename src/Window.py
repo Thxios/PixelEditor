@@ -1,6 +1,6 @@
 import pygame as pg
 from pygame.locals import *
-from src.Section import CanvasSection, PaletteSection, FrameSection, ColorSection, Empty
+from src.Section.Section import CanvasSection, PaletteSection, FrameSection, ColorSection, Empty
 from src.Brush import Brush
 
 
@@ -14,6 +14,7 @@ class MainWindow:
     fps = 126
 
     originX, originY = 250, h - 200
+    _diff = 200
 
     Brush.SetBrush('Pencil')
     # ----- for test -----
@@ -22,9 +23,9 @@ class MainWindow:
     CanvasSection.Setup(originX, 0, w - originX, originY)
     CanvasSection.SetupCanvas(64, 64)
 
-    PaletteSection.Setup(0, 0, originX, originY - 200)
+    PaletteSection.Setup(0, 0, originX, originY - _diff)
     FrameSection.Setup(originX, originY, w - originX, h - originY)
-    ColorSection.Setup(0, originY - 200, originX, h - originY + 200)
+    ColorSection.Setup(0, originY - _diff, originX, h - originY + _diff)
 
     # ----- for test -----
     # sprite = Canvas.Empty(20, 15, (0, 0, 0, 255))
