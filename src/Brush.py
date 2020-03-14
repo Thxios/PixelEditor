@@ -1,4 +1,4 @@
-import pygame as pg
+from src.lib import *
 from src.Layer import Layer
 
 
@@ -81,12 +81,6 @@ class Brush:
 
     def SetCurrentLayer(self, layer: Layer):
         self._layer = layer
-
-    def LayerChanged(self):
-        return self._layer.IsChanged()
-
-    def LayerApplied(self):
-        self._layer.Applied()
 
     # ----- for test -----
     def DrawLine(self, x0, y0, x1, y1):

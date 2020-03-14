@@ -38,6 +38,10 @@ def HSV2RGB(color: (float, float, float)) -> (int, int, int):
     return round(_r * 255), round(_g * 255), round(_b * 255)
 
 
+def Clamp(value, maximum, minimum):
+    return max(min(value, maximum), minimum)
+
+
 t = 0
 def TimerStart():
     global t

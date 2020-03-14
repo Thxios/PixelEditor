@@ -1,7 +1,8 @@
-import pygame as pg
+from src.lib import *
 from src.Section._Section import Section
 from src.Brush import Brush
 from src.Sprite import Sprite
+from src import utility
 from math import ceil
 
 
@@ -26,13 +27,17 @@ class CanvasSection(Section):
     _gray1.fill((127, 127, 127, 255))
     _gray2.fill((192, 192, 192, 255))
 
-    def SetupCanvas(self, w, h):
-        self.sprite = Sprite.Empty(w, h)
-        self.canvasWidth = w
-        self.canvasHeight = h
-        self.canvas = pg.Rect(0, 0, w * self.magnification, h * self.magnification)
+    def Setup(self, x, y, w, h):
+        super().Setup(x, y, w, h)
+        self.SetupCanvas()
+
+    def SetupCanvas(self):
+        # self.sprite = Sprite.Empty(w, h)
+        self.canvasWidth = Sprite.w
+        self.canvasHeight = Sprite.h
+        self.canvas = pg.Rect(0, 0, self.canvasWidth * self.magnification, self.canvasHeight * self.magnification)
         self.canvas.center = self.LocalPosition(self.rect.center)
-        self.canvasSurface = self.sprite.GetSurface()
+        self.canvasSurface = Sprite.GetSurface()
 
         self.backgroundOriginal = pg.Surface((self.canvasWidth, self.canvasHeight), pg.SRCALPHA, 32)
         for _x in range(ceil(self.canvasWidth / self.tileSize)):
@@ -44,8 +49,8 @@ class CanvasSection(Section):
         self.background = pg.transform.scale(self.backgroundOriginal, self.canvas.size)
 
     def SetCanvasPosition(self, x, y):
-        _x = max(min(x, self.w - self.canvas.w), 0)
-        _y = max(min(y, self.h - self.canvas.h), 0)
+        _x = utility.Clamp(x, self.w - self.canvas.w, 0)
+        _y = utility.Clamp(y, self.h - self.canvas.h, 0)
         self.canvas.x = _x
         self.canvas.y = _y
 
@@ -59,8 +64,8 @@ class CanvasSection(Section):
         if self.canvas.collidepoint(*pivot):
             p_x, p_y = pivot
         else:
-            p_x = max(min(pivot[0], self.canvas.x + self.canvas.w), self.canvas.x)
-            p_y = max(min(pivot[1], self.canvas.y + self.canvas.h), self.canvas.y)
+            p_x = utility.Clamp(pivot[0], self.canvas.x + self.canvas.w, self.canvas.x)
+            p_y = utility.Clamp(pivot[1], self.canvas.y + self.canvas.h, self.canvas.y)
         dx = (self.canvas.x - p_x) / self.magnification
         dy = (self.canvas.y - p_y) / self.magnification
         self.magnification += mag
@@ -87,11 +92,11 @@ class CanvasSection(Section):
                                                self.canvas.h + 2 * self.canvasOutlineWidth),
                      1)
         self.surface.blit(self.background, self.canvas.topleft)
-        self.surface.blit(pg.transform.scale(self.sprite.GetSurface(), self.canvas.size), self.canvas.topleft)
+        self.surface.blit(pg.transform.scale(Sprite.GetSurface(), self.canvas.size), self.canvas.topleft)
         # ----- for test -----
         # TimerStart()
         # for _ in range(100):
-        #     _toScale = self.sprite.GetSurface()
+        #     _toScale = Sprite.GetSurface()
         # TimerEnd()
         # TimerStart()
         # for _ in range(100):

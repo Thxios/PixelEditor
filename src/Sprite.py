@@ -1,10 +1,10 @@
-import pygame as pg
+from src.lib import *
 from src.Layer import Layer
 from src.Brush import Brush
 
 
-class _Frame:
-    _layer = []
+class Frame:
+    _layer: [Layer]
     _layerCount = 0
 
     surface = pg.Surface
@@ -13,10 +13,17 @@ class _Frame:
         self.w = wid
         self.h = hei
         self.surface = pg.Surface((wid, hei), pg.SRCALPHA, 32)
+        self._layer = []
 
     def AddLayer(self, layer: Layer):
         self._layer.append(layer)
         self._layerCount += 1
+
+    def AddLayerEmpty(self, name=None):
+        if name is None:
+            name = 'Layer ' + str(self._layerCount)
+        _layer = Layer.Empty(self.w, self.h, name)
+        self.AddLayer(_layer)
 
     def DeleteLayer(self, idx):
         if idx < 0 or idx >= self._layerCount:
@@ -38,13 +45,19 @@ class _Frame:
             pg.surfarray.blit_array(self.surface, _layer.GetArray())
         return self.surface
 
+    def GetLayerName(self) -> [str]:
+        _name = []
+        for _layer in self._layer:
+            _name.append(_layer.name)
+        return _name
+
     def LayerCount(self) -> int:
         return self._layerCount
 
     @staticmethod
     def Empty(wid, hei):
-        _frame = _Frame(wid, hei)
-        _frame.AddLayer(Layer.Empty(wid, hei))
+        _frame = Frame(wid, hei)
+        _frame.AddLayer(Layer.Empty(wid, hei, 'Layer 0'))
         return _frame
 
 
@@ -60,19 +73,19 @@ class Sprite:
         self.w = wid
         self.h = hei
 
-    def AddFrame(self, frame: _Frame):
+    def AddFrame(self, frame: Frame):
         self._frame.append(frame)
         self._frameCount += 1
         if self._frameCount == 1:
             self.SetFrame(0)
 
     def GetSurface(self) -> pg.Surface:
-        if Brush.LayerChanged():
+        if self.CurrentLayer().IsChanged():
             self.surface = self.CurrentFrame().GetSurface()
-            Brush.LayerApplied()
+            self.CurrentLayer().Applied()
         return self.surface
 
-    def CurrentFrame(self) -> _Frame:
+    def CurrentFrame(self) -> Frame:
         return self._frame[self._currentFrame]
 
     def CurrentLayer(self) -> Layer:
@@ -102,6 +115,10 @@ class Sprite:
     def Empty(wid, hei, frameCount=1):
         _sprite = Sprite(wid, hei)
         for _ in range(frameCount):
-            _sprite.AddFrame(_Frame.Empty(wid, hei))
+            _sprite.AddFrame(Frame.Empty(wid, hei))
         return _sprite
+
+
+Sprite = Sprite.Empty(64, 64)
+Sprite.CurrentFrame().AddLayerEmpty()
 

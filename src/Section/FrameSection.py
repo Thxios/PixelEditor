@@ -1,6 +1,6 @@
-import pygame as pg
+from src.lib import *
 from src.Section._Section import Section
 
 
 class FrameSection(Section):
-    bgColor = (32, 32, 32)
+    bgColor = (43, 43, 43)

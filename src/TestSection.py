@@ -1,4 +1,5 @@
-import pygame as pg
+from src.lib import *
+from src.Command import Command
 from src.Section.Section import ColorSection
 
 
@@ -19,6 +20,7 @@ clock = pg.time.Clock()
 while 1:
     preX, preY = mouseX, mouseY
     mouseX, mouseY = pg.mouse.get_pos()
+    Command.GetInput()
     for e in pg.event.get():
         if e.type == pg.QUIT:
             pg.quit()

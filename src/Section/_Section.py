@@ -1,4 +1,4 @@
-import pygame as pg
+from src.lib import *
 
 
 class Section:
