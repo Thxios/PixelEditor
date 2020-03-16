@@ -27,6 +27,9 @@ class CanvasSection(Section):
     _gray1.fill((127, 127, 127, 255))
     _gray2.fill((192, 192, 192, 255))
 
+    # ----- for test -----
+    limit = 20
+
     def Setup(self, x, y, w, h):
         super().Setup(x, y, w, h)
         self.SetupCanvas()
@@ -49,13 +52,20 @@ class CanvasSection(Section):
         self.background = pg.transform.scale(self.backgroundOriginal, self.canvas.size)
 
     def SetCanvasPosition(self, x, y):
-        _x = utility.Clamp(x, self.w - self.canvas.w, 0)
-        _y = utility.Clamp(y, self.h - self.canvas.h, 0)
+        _x = utility.Clamp(x, self.w - self.limit, -self.canvas.w + self.limit)
+        _y = utility.Clamp(y, self.h - self.limit, -self.canvas.h + self.limit)
         self.canvas.x = _x
         self.canvas.y = _y
 
     def MoveCanvas(self, dx, dy):
         self.canvas.move_ip(dx, dy)
+        if self.canvas.x > self.w - self.limit or self.canvas.x < -self.canvas.w + self.limit:
+            self.canvas.x = utility.Clamp(self.canvas.x,
+                                          self.w - self.limit, -self.canvas.w + self.limit)
+        if self.canvas.y > self.h - self.limit or self.canvas.y < -self.canvas.h + self.limit:
+            self.canvas.y = utility.Clamp(self.canvas.y,
+                                          self.h - self.limit, -self.canvas.h + self.limit)
+        # print(self.canvas.topleft)
         self.Changed()
 
     def Magnify(self, mag, pivot):
@@ -94,22 +104,22 @@ class CanvasSection(Section):
         self.surface.blit(self.background, self.canvas.topleft)
         self.surface.blit(pg.transform.scale(Sprite.GetSurface(), self.canvas.size), self.canvas.topleft)
         # ----- for test -----
-        # TimerStart()
+        # utility.TimerStart()
         # for _ in range(100):
         #     _toScale = Sprite.GetSurface()
-        # TimerEnd()
-        # TimerStart()
+        # utility.TimerEnd()
+        # utility.TimerStart()
         # for _ in range(100):
         #     _toBlit = pg.transform.scale(_toScale, (self.canvas.w, self.canvas.h))  # 0.3578s
-        # TimerEnd()
+        # utility.TimerEnd()
         # TimerStart()
         # for _ in range(100):
         #     _temp = pg.transform.rotozoom(_toScale, 0, self.magnification)
         # TimerEnd()
-        # TimerStart()
+        # utility.TimerStart()
         # for _ in range(100):
         #     self.surface.blit(_toBlit, self.canvas.topleft)  # 0.0713s
-        # TimerEnd()
+        # utility.TimerEnd()
         # pg.quit()
         # quit()
 
@@ -145,10 +155,7 @@ class CanvasSection(Section):
             _pixelX, _pixelY, _valid = self.PositionToPixel(x, y)
             _prePixelX, _prePixelY, _preValid = self.PositionToPixel(_x, _y)
             if _valid and _preValid:
-                if abs(_prePixelX - _pixelX) > 1 or abs(_prePixelY - _pixelY) > 1:
-                    Brush.DrawLine(_prePixelX, _prePixelY, _pixelX, _pixelY)
-                else:
-                    Brush.OnMouseDown((_pixelX, _pixelY))
+                Brush.OnMouseDrag((_pixelX, _pixelY), (_prePixelX, _prePixelY))
                 self.Changed()
         elif button == 2:
             self.MoveCanvas(x - _x, y - _y)

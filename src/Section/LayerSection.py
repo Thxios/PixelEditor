@@ -5,15 +5,19 @@ from src.Text import Text
 
 
 class LayerSection(Section):
-    bgColor = (43, 43, 43)
-    layerCount = Sprite.LayerCount()
-
+    bgColor: (int, int, int) = (43, 43, 43)
+    layerCount: int = Sprite.LayerCount()
+    selectedLayer: int = 0
     # ----- for test -----
-    rectTerm = 15
-    verticalTerm = 7
-    layerRectHeight = 30
-    layerRect: [pg.Rect] = []
-    layerName = Sprite.CurrentFrame().GetLayerName()
+    rectTerm: int = 10
+    verticalTerm: int = 3
+    leftTerm: int = 20
+    layerRectHeight: int = 30
+    layerRect: List[pg.Rect] = []
+    layerName: List[str] = Sprite.CurrentFrame().GetLayerName()
+
+    layerColor: (int, int, int) = (60, 63, 65)
+    selectedColor: (int, int, int) = (75, 110, 175)
 
     def Setup(self, x, y, w, h):
         super().Setup(x, y, w, h)
@@ -22,14 +26,35 @@ class LayerSection(Section):
         self.MakeRect()
 
     def Update(self):
+        # sprint('re')
         self.surface.fill(self.bgColor)
         for i, rect in enumerate(self.layerRect):
-            pg.draw.rect(self.surface, (255, 255, 255), rect, 2)
+            pg.draw.rect(self.surface, self.layerColor, rect)
+            if i == self.selectedLayer:
+                pg.draw.rect(self.surface,
+                             self.selectedColor,
+                             rect.inflate(-2 * self.verticalTerm, -2 * self.verticalTerm))
             Text.LeftAligned(self.layerName[i], self.surface, rect, 10)
 
     def MakeRect(self):
         for i in range(self.layerCount):
             self.layerRect.append(pg.Rect(self.rectTerm,
                                           self.rectTerm + (self.layerRectHeight + self.verticalTerm) * i,
-                                          self.w - self.rectTerm * 2,
+                                          self.w - self.rectTerm * 2 - self.leftTerm,
                                           self.layerRectHeight))
+
+    def SetLayer(self, idx):
+        if idx < self.layerCount:
+            self.selectedLayer = idx
+        else:
+            raise IndexError(str(self.layerCount) + ' layer but given ' + str(idx))
+        self.Changed()
+
+    def OnMouseDown(self, button, x, y):
+        x, y = self.LocalPosition((x, y))
+        if button == 1:
+            for i, rect in enumerate(self.layerRect):
+                if rect.collidepoint(x, y):
+                    Sprite.SetCurrentLayer(i)
+                    self.selectedLayer = i
+                    self.Changed()

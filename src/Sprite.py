@@ -4,7 +4,7 @@ from src.Brush import Brush
 
 
 class Frame:
-    _layer: [Layer]
+    _layer: List[Layer]
     _layerCount = 0
 
     surface = pg.Surface
@@ -41,8 +41,8 @@ class Frame:
 
     def GetSurface(self) -> pg.Surface:
         self.surface.fill((0, 0, 0, 0))
-        for _layer in self._layer:
-            pg.surfarray.blit_array(self.surface, _layer.GetArray())
+        for i in range(self._layerCount - 1, -1, -1):
+            self.surface.blit(self._layer[i].GetSurface(), (0, 0))
         return self.surface
 
     def GetLayerName(self) -> [str]:
@@ -64,10 +64,10 @@ class Frame:
 class Sprite:
     surface: pg.Surface
 
-    _frame = []
-    _currentFrame = 0
-    _frameCount = 0
-    _currentLayer = 0
+    _frame: List[Frame] = []
+    _currentFrame: int = 0
+    _frameCount: int = 0
+    _currentLayer: int = 0
 
     def __init__(self, wid, hei):
         self.w = wid
@@ -84,6 +84,10 @@ class Sprite:
             self.surface = self.CurrentFrame().GetSurface()
             self.CurrentLayer().Applied()
         return self.surface
+
+    def SetCurrentLayer(self, idx):
+        self._currentLayer = idx
+        Brush.SetCurrentLayer(self.CurrentFrame().GetLayer(idx))
 
     def CurrentFrame(self) -> Frame:
         return self._frame[self._currentFrame]
@@ -120,5 +124,7 @@ class Sprite:
 
 
 Sprite = Sprite.Empty(64, 64)
+Sprite.CurrentFrame().AddLayerEmpty()
+Sprite.CurrentFrame().AddLayerEmpty()
 Sprite.CurrentFrame().AddLayerEmpty()
 

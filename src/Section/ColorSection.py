@@ -79,7 +79,7 @@ class ColorSection(Section):
         self.colorHSV = color
         self.colorRGB = utility.HSV2RGB(color)
         self.Changed()
-        Brush.pencil.SetCurrentColor((*self.colorRGB, self.alpha))
+        Brush.SetCurrentColor((*self.colorRGB, self.alpha))
         if self.colorHSV[V] > 50:
             self.dotImage = self.dotDarkImage
         else:
@@ -87,7 +87,7 @@ class ColorSection(Section):
 
     def SetAlpha(self, alpha):
         self.alpha = alpha
-        Brush.pencil.SetCurrentColor((*self.colorRGB, self.alpha))
+        Brush.SetCurrentColor((*self.colorRGB, self.alpha))
         self.Changed()
 
     def DrawColorWheel(self):

@@ -4,10 +4,10 @@ from src.lib import *
 class Text:
     pg.font.init()
 
-    _fontName = 'd2coding'
-    _fontSize = 16
-    font = pg.font.SysFont(_fontName, _fontSize)
-    color = (255, 255, 255)
+    _fontName: str = 'd2coding'
+    _fontSize: int = 16
+    font: pg.font.Font = pg.font.SysFont(_fontName, _fontSize)
+    color: (int, int, int) = (255, 255, 255)
 
     def TextSurface(self, text: str) -> pg.Surface:
         return self.font.render(text, True, self.color)

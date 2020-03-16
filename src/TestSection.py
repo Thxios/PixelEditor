@@ -1,15 +1,16 @@
 from src.lib import *
 from src.Command import Command
-from src.Section.Section import ColorSection
+from src.Section.Section import *
 
 
-section = ColorSection
+section = BrushSection
 pg.init()
 
-w, h = 250, 400
+w, h = 66, 250
 section.Setup(0, 0, w, h)
 
 screen = pg.display.set_mode((w, h))
+print(screen.get_size())
 mouseX, mouseY = 0, 0
 preX, preY = 0, 0
 

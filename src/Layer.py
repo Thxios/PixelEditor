@@ -54,7 +54,7 @@ class Layer:
         return _layer
 
     def GetSurface(self) -> pg.Surface:
-        return self._surface
+        return self._surface.copy()
 
     def GetArray(self) -> np.ndarray:
         return self._pixel

@@ -1,5 +1,5 @@
 from src.lib import *
-from src.Section.Section import CanvasSection, PaletteSection, FrameSection, ColorSection, LayerSection, Empty
+from .Section.Section import *
 from src.Command import Command
 from src.Brush import Brush
 
@@ -16,26 +16,23 @@ class MainWindow:
     clock = pg.time.Clock()
     fps = 126
 
-    originX, originY = 250, h - 200
-    _diff = 200
-    _left = 250
-    _l1 = 250
-    _l2 = 400
-    _l3 = 250
-    _r1 = 800
-    _r2 = 100
-
     Brush.SetBrush('Pencil')
 
-    CanvasSection.Setup(_left, 0, w - _left, _r1)
-    # CanvasSection.SetupCanvas(64, 64)
+    _topTerm = 30
+    _left = 250
+    _l1 = 250
+    _l2 = 400 - _topTerm
+    _l3 = 250
+    _r1 = 800
+    _r2 = 100 - _topTerm
+    _bs = 52
 
-    PaletteSection.Setup(0, 0, _left, _l1)
-    # FrameSection.Setup(originX, originY, w - originX, h - originY)
-    FrameSection.Setup(_left, _r1, w - _left, _r2)
-    # ColorSection.Setup(0, originY - _diff, originX, h - originY + _diff)
-    ColorSection.Setup(0, _l1, _left, _l2)
-    LayerSection.Setup(0, _l1 + _l2, _left, _l3)
+    CanvasSection.Setup(_left, _topTerm, w - _left, _r1)
+    PaletteSection.Setup(0, _topTerm, _left - _bs, _l1)
+    BrushSection.Setup(_left - _bs, _topTerm, _bs, _l1)
+    FrameSection.Setup(_left, _r1 + _topTerm, w - _left, _r2)
+    ColorSection.Setup(0, _l1 + _topTerm, _left, _l2)
+    LayerSection.Setup(0, _l1 + _l2 + _topTerm, _left, _l3)
 
     # ----- for test -----
     # sprite = Canvas.Empty(20, 15, (0, 0, 0, 255))
@@ -71,6 +68,7 @@ class MainWindow:
             FrameSection.Draw(self.screen)
             ColorSection.Draw(self.screen)
             LayerSection.Draw(self.screen)
+            BrushSection.Draw(self.screen)
 
             self.clock.tick(self.fps)
 
@@ -87,6 +85,10 @@ class MainWindow:
             self.currentSection = FrameSection
         elif ColorSection.IsClicked((self.mouseX, self.mouseY)):
             self.currentSection = ColorSection
+        elif LayerSection.IsClicked((self.mouseX, self.mouseY)):
+            self.currentSection = LayerSection
+        elif BrushSection.IsClicked((self.mouseX, self.mouseY)):
+            self.currentSection = BrushSection
         else:
             self.currentSection = Empty
 
