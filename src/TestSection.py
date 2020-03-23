@@ -3,10 +3,10 @@ from src.Command import Command
 from src.Section.Section import *
 
 
-section = BrushSection
+section = PaletteSection
 pg.init()
 
-w, h = 66, 250
+w, h = 198, 250
 section.Setup(0, 0, w, h)
 
 screen = pg.display.set_mode((w, h))

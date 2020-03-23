@@ -52,11 +52,11 @@ class ColorSection(Section):
 
         self.SetColorRGB(self.colorRGB)
         self.valueBarRect = pg.Rect((self.w - self.barWidth) // 2,
-                                    self.wheelCenterY + self.radius + self.radiusTerm + 15 + 1,
+                                    self.wheelCenterY + self.radius + self.radiusTerm + 13 + 1,
                                     self.barWidth,
                                     self.barHeight)
         self.alphaBarRect = pg.Rect((self.w - self.barWidth) // 2,
-                                    self.wheelCenterY + self.radius + self.radiusTerm + 15 + 1 + self.barHeight + 5,
+                                    self.wheelCenterY + self.radius + self.radiusTerm + 13 + 1 + self.barHeight + 5,
                                     self.barWidth,
                                     self.barHeight)
 
@@ -120,8 +120,8 @@ class ColorSection(Section):
 
     def DrawPreview(self):
         self.preViewSurface.fill((*self.colorRGB, self.alpha))
-        self.surface.blit(self.previewAlphaImage, (20, 310))
-        self.surface.blit(self.preViewSurface, (20, 310))
+        self.surface.blit(self.previewAlphaImage, (20, 300))
+        self.surface.blit(self.preViewSurface, (20, 300))
 
     def Position2HSV(self, x, y) -> (float, float, float):
         _theta = atan2(self.wheelCenterY - y, x - self.wheelCenterX)
