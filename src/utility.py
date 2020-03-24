@@ -4,7 +4,7 @@ import sys
 from time import time
 
 
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 
 def RGBA2INT(color: (int, int, int, int)) -> int:

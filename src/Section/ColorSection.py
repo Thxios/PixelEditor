@@ -1,6 +1,7 @@
 import pygame as pg
 from src.Section._Section import Section
 from src.Brush import Brush
+from src.Color import Color
 from src.Command import Command
 from src import utility
 from math import sin, cos, atan2, degrees, radians, sqrt
@@ -16,9 +17,10 @@ class ColorSection(Section):
 
     bgColor = (43, 43, 43)
 
-    colorRGB = (166, 106, 150)
-    colorHSV = utility.RGB2HSV(colorRGB)
-    alpha = 255
+    color = Color.RGB(166, 106, 150)
+    # colorRGB = (166, 106, 150)
+    # colorHSV = color.hsv
+    # alpha = 255
     scrollStep = 5
 
     colorWheelImage = pg.image.load('data/hue4.png')
@@ -27,9 +29,9 @@ class ColorSection(Section):
     radius = 100
     radiusTerm = colorWheelImage.get_width() // 2 - radius
 
-    dotImage: pg.Surface
     dotDarkImage = pg.image.load('data/dot_dark.png')
     dotBrightImage = pg.image.load('data/dot_bright.png')
+    dotImage: pg.Surface
     dotRadius = 3
 
     barWidth = 200
@@ -50,7 +52,7 @@ class ColorSection(Section):
     def Setup(self, x, y, w, h):
         super().Setup(x, y, w, h)
 
-        self.SetColorRGB(self.colorRGB)
+        self.SetColor()
         self.valueBarRect = pg.Rect((self.w - self.barWidth) // 2,
                                     self.wheelCenterY + self.radius + self.radiusTerm + 13 + 1,
                                     self.barWidth,
@@ -68,37 +70,37 @@ class ColorSection(Section):
         self.DrawColorBar()
         self.DrawPreview()
 
-    def SetColorRGB(self, color: (int, int, int)):
-        if len(color) == 4:
-            _r, _g, _b, _ = color
-        else:
-            _r, _g, _b = color
-        self.SetColorHSV(utility.RGB2HSV(self.colorRGB))
-
-    def SetColorHSV(self, color: (float, float, float)):
-        self.colorHSV = color
-        self.colorRGB = utility.HSV2RGB(color)
-        self.Changed()
-        Brush.SetCurrentColor((*self.colorRGB, self.alpha))
-        if self.colorHSV[V] > 50:
+    def SetColor(self):
+        if self.color.hsv[V] > 50:
             self.dotImage = self.dotDarkImage
         else:
             self.dotImage = self.dotBrightImage
-
-    def SetAlpha(self, alpha):
-        self.alpha = alpha
-        Brush.SetCurrentColor((*self.colorRGB, self.alpha))
+        Brush.SetCurrentColor(self.color.rgba)
         self.Changed()
 
+    def SetColorRGB(self, r, g, b):
+        self.color.rgb = (r, g, b)
+        self.SetColor()
+
+    def SetColorHSV(self, h, s, v):
+        # self.colorHSV = color
+        # self.colorRGB = utility.HSV2RGB(color)
+        self.color.hsv = (h, s, v)
+        self.SetColor()
+
+    def SetAlpha(self, alpha):
+        self.color.alpha = utility.Clamp(alpha, 255, 0)
+        self.SetColor()
+
     def DrawColorWheel(self):
-        _theta = radians(90 - self.colorHSV[H])
-        _x = round(cos(_theta) * self.radius * self.colorHSV[S] / 100)
-        _y = -round(sin(_theta) * self.radius * self.colorHSV[S] / 100)
+        _theta = radians(90 - self.color.hsv[H])
+        _x = round(cos(_theta) * self.radius * self.color.hsv[S] / 100)
+        _y = -round(sin(_theta) * self.radius * self.color.hsv[S] / 100)
         # print(_x, _y)
         self.surface.blit(self.colorWheelImage,
                           (self.wheelCenterX - self.radius - self.radiusTerm,
                            self.wheelCenterY - self.radius - self.radiusTerm))
-        self.valueWheelImage.set_alpha(255 - round(self.colorHSV[V] / 100 * 255))
+        self.valueWheelImage.set_alpha(255 - round(self.color.hsv[V] / 100 * 255))
         self.surface.blit(self.valueWheelImage,
                           (self.wheelCenterX - self.radius - self.radiusTerm,
                            self.wheelCenterY - self.radius - self.radiusTerm))
@@ -107,19 +109,20 @@ class ColorSection(Section):
                            self.wheelCenterY + _y - self.dotRadius))
 
     def DrawColorBar(self):
-        _baseColor = (self.colorHSV[H], self.colorHSV[S], 100)
+        _baseColor = (self.color.hsv[H], self.color.hsv[S], 100)
 
-        pg.draw.rect(self.surface, utility.HSV2RGB(_baseColor), self.valueBarRect)
-        pg.draw.rect(self.surface, self.colorRGB, self.alphaBarRect)
+        # pg.draw.rect(self.surface, utility.HSV2RGB(_baseColor), self.valueBarRect)
+        pg.draw.rect(self.surface, Color.HSV2RGB(_baseColor), self.valueBarRect)
+        pg.draw.rect(self.surface, self.color.rgb, self.alphaBarRect)
         self.surface.blit(self.valueImage, self.valueBarRect.topleft)
         self.surface.blit(self.alphaImage, self.alphaBarRect.topleft)
-        self.surface.blit(self.dotImage, (self.valueBarRect.x + self.colorHSV[V] / 100 * self.barWidth - self.dotRadius,
+        self.surface.blit(self.dotImage, (self.valueBarRect.x + self.color.hsv[V] / 100 * self.barWidth - self.dotRadius,
                                           self.valueBarRect.centery - self.dotRadius))
-        self.surface.blit(self.dotImage, (self.alphaBarRect.x + self.alpha / 255 * self.barWidth - self.dotRadius,
+        self.surface.blit(self.dotImage, (self.alphaBarRect.x + self.color.alpha / 255 * self.barWidth - self.dotRadius,
                                           self.alphaBarRect.centery - self.dotRadius))
 
     def DrawPreview(self):
-        self.preViewSurface.fill((*self.colorRGB, self.alpha))
+        self.preViewSurface.fill(self.color.rgba)
         self.surface.blit(self.previewAlphaImage, (20, 300))
         self.surface.blit(self.preViewSurface, (20, 300))
 
@@ -129,24 +132,25 @@ class ColorSection(Section):
         if _h < 0:
             _h += 360
         _s = min(self.DistToOrigin(x, y), 100)
-        _v = self.colorHSV[V]
+        _v = self.color.hsv[V]
         return _h, _s, _v
 
     def Position2Value(self, x) -> (float, float, float):
         _dx = utility.Clamp(x - self.valueBarRect.x, self.barWidth, 0)
         _v = _dx / self.barWidth * 100
-        _h, _s, _ = self.colorHSV
+        _h, _s, _ = self.color.hsv
         return _h, _s, _v
 
     def DiffHSV(self, dh=0, ds=0, dv=0):
-        _h = self.colorHSV[H] + dh
+        _h = self.color.hsv[H] + dh
         if _h >= 360:
             _h -= 360
         elif _h < 0:
             _h += 360
-        _s = utility.Clamp(self.colorHSV[S] + ds, 100, 0)
-        _v = utility.Clamp(self.colorHSV[V] + dv, 100, 0)
-        self.SetColorHSV((_h, _s, _v))
+        _s = utility.Clamp(self.color.hsv[S] + ds, 100, 0)
+        _v = utility.Clamp(self.color.hsv[V] + dv, 100, 0)
+        # self.color.hsv = (_h, _s, _v)
+        self.SetColorHSV(_h, _s, _v)
 
     def Position2Alpha(self, x) -> int:
         _dx = utility.Clamp(x - self.valueBarRect.x, self.barWidth, 0)
@@ -173,7 +177,7 @@ class ColorSection(Section):
             elif self.valueBarRect.collidepoint(x, y):
                 self.DiffHSV(dv=self.scrollStep)
             elif self.alphaBarRect.collidepoint(x, y):
-                self.SetAlpha(utility.Clamp(self.alpha + self.scrollStep, 255, 0))
+                self.SetAlpha(self.color.alpha + self.scrollStep)
         elif button == 5:
             if self.DistToOrigin(x, y) < self.radius + self.radiusTerm:
                 if Command.GetKey(pg.K_LCTRL):
@@ -183,16 +187,19 @@ class ColorSection(Section):
             elif self.valueBarRect.collidepoint(x, y):
                 self.DiffHSV(dv=-self.scrollStep)
             elif self.alphaBarRect.collidepoint(x, y):
-                self.SetAlpha(utility.Clamp(self.alpha - self.scrollStep, 255, 0))
+                self.SetAlpha(self.color.alpha - self.scrollStep)
 
     def OnMouseDrag(self, button, x, y, _x, _y):
         x, y = self.LocalPosition((x, y))
         if self.colorChange[WHEEL]:
-            self.SetColorHSV(self.Position2HSV(x, y))
+            self.SetColorHSV(*self.Position2HSV(x, y))
+            # self.color.hsv = self.Position2HSV(x, y)
         elif self.colorChange[VALUE]:
-            self.SetColorHSV(self.Position2Value(x))
+            self.SetColorHSV(*self.Position2Value(x))
+            # self.color.hsv = self.Position2Value(x)
         elif self.colorChange[ALPHA]:
             self.SetAlpha(self.Position2Alpha(x))
+            # self.color.alpha = self.Position2Alpha(x)
 
     def OnMouseUp(self, button, x, y):
         self.colorChange = [0, 0, 0]

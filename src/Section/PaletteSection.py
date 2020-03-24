@@ -14,6 +14,9 @@ class PaletteSection(Section):
     colorCount = 0
     colorRect: List[pg.Rect] = []
 
+    selectedIndex = 1
+    selectedBoxColor = (255, 255, 0, 127)
+
     # ----- for test -----
     palettePath = 'palette/0.txt'
 
@@ -32,6 +35,10 @@ class PaletteSection(Section):
             pg.draw.rect(self.surface, self.paletteBoxColor,
                          colorRect.inflate(2 * self.colorBoxTerm, 2 * self.colorBoxTerm))
             pg.draw.rect(self.surface, self.color[i], colorRect)
+            pg.draw.rect(self.surface, (255, 255, 255), colorRect, 1)
+
+        if self.selectedIndex >= 0:
+            pg.draw.rect(self.surface, self.selectedBoxColor, self.colorRect[self.selectedIndex].inflate(2, 2), 3)
 
     def MakeColorRect(self):
         self.colorRect = []

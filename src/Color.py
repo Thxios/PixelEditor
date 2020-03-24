@@ -4,13 +4,14 @@ import colorsys
 
 
 class Color:
-    def __init__(self, r, g, b, a=255):
-        self._r = r
-        self._g = g
-        self._b = b
-        self._a = a
+    _r: int
+    _g: int
+    _b: int
+    _a: int
 
-        self._h, self._s, self._v = Color.RGB2HSV((r, g, b))
+    _h: float
+    _s: float
+    _v: float
 
     @property
     def rgb(self) -> (int, int, int):
@@ -39,6 +40,16 @@ class Color:
         self._h, self._s, self._v = hsv
         self._r, self._g, self._b = Color.HSV2RGB(self.hsv)
 
+    @property
+    def alpha(self):
+        return self._a
+
+    @alpha.setter
+    def alpha(self, alpha):
+        if alpha > 255 or alpha < 0:
+            raise ValueError('alpha get ' + str(alpha))
+        self._a = alpha
+
     @staticmethod
     def RGB2HSV(rgb: (int, int, int)) -> (float, float, float):
         r, g, b = rgb
@@ -52,5 +63,17 @@ class Color:
             raise TypeError('Hue value is invalid')
         _r, _g, _b = colorsys.hsv_to_rgb(_h / 360, _s / 100, _v / 100)
         return round(_r * 255), round(_g * 255), round(_b * 255)
+
+    @staticmethod
+    def RGB(r, g, b, a=255):
+        _color = Color()
+        _color.rgba = (r, g, b, a)
+        return _color
+
+    @staticmethod
+    def HSV(h, s, v):
+        _color = Color()
+        _color.hsv = (h, s, v)
+        return _color
 
 
