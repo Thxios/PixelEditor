@@ -30,16 +30,79 @@ class _Brush:
 
 
 class _PencilBrush(_Brush):
-    def OnMouseDown(self, clickedPixel, layer: Layer):
-        layer.SetPixel(*clickedPixel, self.currentColor)
 
-    def OnMouseDrag(self, clickedPixel, layer: Layer):
-        layer.SetPixel(*clickedPixel, self.currentColor)
+    # ----- for test -----
+    brush = [
+        np.array([
+            [1],
+        ], dtype=np.uint32).T,
+        np.array([
+            [1, 1],
+            [1, 1],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 1, 0],
+            [1, 1, 1],
+            [0, 1, 0],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 1, 1, 0],
+            [1, 1, 1, 1],
+            [1, 1, 1, 1],
+            [0, 1, 1, 0],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [0, 1, 1, 1, 0],
+        ], dtype=np.uint32).T,
+    ]
+
+    brushSize = 4
+
+    def OnMouseDown(self, clickedPixel, layer: Layer):
+        # layer.SetPixel(*clickedPixel, self.currentColor)
+        layer.BrushDown(*clickedPixel, self.brush[self.brushSize], self.currentColor)
 
 
 class _EraserBrush(_Brush):
+
+    # ----- for test -----
+    brush = [
+        np.array([
+            [1],
+        ], dtype=np.uint32).T,
+        np.array([
+            [1, 1],
+            [1, 1],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 1, 0],
+            [1, 1, 1],
+            [0, 1, 0],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 1, 1, 0],
+            [1, 1, 1, 1],
+            [1, 1, 1, 1],
+            [0, 1, 1, 0],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [0, 1, 1, 1, 0],
+        ], dtype=np.uint32).T,
+    ]
+
+    brushSize = 4
+
+
     def OnMouseDown(self, clickedPixel, layer: Layer):
-        layer.SetPixel(*clickedPixel, self.currentColor)
+        layer.BrushDown(*clickedPixel, self.brush[self.brushSize], self.currentColor)
 
     def OnMouseDrag(self, clickedPixel, layer: Layer):
         layer.SetPixel(*clickedPixel, self.currentColor)
@@ -71,7 +134,8 @@ class Brush:
         self.SetBrush('Pencil')
 
     def OnMouseDown(self, clickedPixel):
-        self._currentBrush.OnMouseDown(clickedPixel, self._layer)
+        # self._currentBrush.OnMouseDown(clickedPixel, self._layer)
+        pass
 
     def OnMouseDrag(self, clickedPixel, previousPixel=None):
         _pixelX, _pixelY = clickedPixel

@@ -42,10 +42,11 @@ class Frame:
     def GetSurface(self) -> pg.Surface:
         self.surface.fill((0, 0, 0, 0))
         for i in range(self._layerCount - 1, -1, -1):
-            self.surface.blit(self._layer[i].GetSurface(), (0, 0))
+            if self._layer[i].visible:
+                self.surface.blit(self._layer[i].GetSurface(), (0, 0))
         return self.surface
 
-    def GetLayerName(self) -> [str]:
+    def GetLayerName(self) -> List[str]:
         _name = []
         for _layer in self._layer:
             _name.append(_layer.name)

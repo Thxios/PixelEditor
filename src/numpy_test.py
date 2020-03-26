@@ -1,6 +1,7 @@
 import numpy as np
 import pygame as pg
 from time import time
+from src.utility import Clamp
 
 
 t = 0
@@ -11,27 +12,48 @@ def End():
     print(time() - t)
 
 
-class Test:
-    c = (0, 0, 0)
+size = 10
 
-    @property
-    def aa(self):
-        return self.c
+a = np.array([
+    [255 for _ in range(size)] for _ in range(size)
+])
 
-    @aa.setter
-    def aa(self, val):
-        print(val)
-        self.c = val
+brush = np.array([
+    [0, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [0, 1, 1, 1, 0],
+])
 
-    def __get__(self, instance, owner):
-        print('s')
+brushSize = brush.shape[0]
+colorScala = 10
+
+print(a.shape)
 
 
-i = Test()
-print(i.aa)
-i.aa = (255, 255, 255)
-print(i.aa)
+def Plot(x, y):
+    xs, ys = x - brushSize // 2, y - brushSize // 2
+    xe, ye = xs + brushSize, ys + brushSize
+    print(x, y)
+    print('x', xs, xe, 'y', ys, ye, '\n')
 
-pg.init()
-screen = pg.display.set_mode((640, 400))
-screen.fill(i)
+    des = a[max(xs, 0): min(xe, size), max(ys, 0): min(ye, size)]
+    print(des.T)
+    print('des range:', (max(xs, 0), min(xe, size)), (max(ys, 0), min(ye, size)), '\n')
+
+    brush_des = brush[max(-xs, 0): min(brushSize - xe + size, brushSize),
+                max(-ys, 0): min(brushSize - ye + size, brushSize)]
+    print(brush[max(-xs, 0): min(brushSize - xe + size, brushSize),
+          max(-ys, 0): min(brushSize - ye + size, brushSize)].T)
+    print('brush range:',
+          (max(-xs, 0), min(brushSize - xe + size, brushSize)),
+          (max(-ys, 0), min(brushSize - ye + size, brushSize)), '\n')
+
+    des -= des * brush_des
+    des += colorScala * brush_des
+    print(a.T, '\n\n')
+
+Plot(2, 2)
+Plot(0, 0)
+Plot(9, 8)

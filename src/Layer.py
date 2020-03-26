@@ -1,7 +1,6 @@
 from src.lib import *
 from src import utility
 
-
 class Layer:
     def __init__(self, wid, hei, name, color=None):
         self.w = wid
@@ -15,17 +14,41 @@ class Layer:
             self._surface.fill(color)
         self._pixel = pg.surfarray.pixels2d(self._surface)
 
+        self.visible = True
+
     def __str__(self):
         return str(self._pixel.T)
 
     def Clear(self):
         self._pixel = np.zeros((self.w, self.h))
-        self._hasChange = True
+        self.Changed()
 
     def SetPixel(self, x, y, color):
         if self._pixel[x][y] != utility.RGBA2INT(color):
             self._pixel[x][y] = utility.RGBA2INT(color)
-            self._hasChange = True
+            self.Changed()
+
+    def BrushDown(self, x, y, brush: np.ndarray, color):
+        _brushWidth, _brushHeight = brush.shape
+        xs, ys = x - _brushWidth // 2, y - _brushHeight // 2
+        xe, ye = xs + _brushWidth, ys + _brushHeight
+        # xe, ye = x + _brushWidth // 2, y + _brushHeight // 2
+        # xs, ys = xe - _brushWidth, ye - _brushHeight
+        # print((xs, xe), (ys, ye))
+        # _destArrXs, _destArrXe = max(xs, 0), min(xe, self.w)
+        # _destArrYs, _destArrYe = max(ys, 0), min(ye, self.h)
+        # print((_destArrXs, _destArrXe), (_destArrYs, _destArrYe))
+        _destArr = self._pixel[max(xs, 0): min(xe, self.w), max(ys, 0): min(ye, self.h)]
+        # print(_destArr.shape)
+
+        # print(brush)
+        _destBrush = brush[max(-xs, 0): min(_brushWidth - xe + self.w, _brushWidth),
+                           max(-ys, 0): min(_brushHeight - ye + self.h, _brushHeight)]
+
+        _destArr -= _destBrush * _destArr
+        _destArr += _destBrush * utility.RGBA2INT(color)
+        # print(_destArr)
+        self.Changed()
 
     def GetPixel(self, x, y) -> (int, int, int, int):
         return utility.INT2RGBA(self._pixel[x][y])
@@ -39,9 +62,8 @@ class Layer:
             xe, ye = min(self.w, x + layer.w), min(self.h, y + layer.h)
             crop_xs, crop_ys = max(-x, 0), max(-y, 0)
             crop_xe, crop_ye = min(self.w - x, layer.w), min(self.h - y, layer.h)
-
             self._pixel[xs:xe, ys:ye] = layer._pixel[crop_xs:crop_xe, crop_ys:crop_ye]
-            self._hasChange = True
+            self.Changed()
 
     def CropLayer(self, xRange, yRange):
         _xs, _xe = xRange
@@ -64,6 +86,9 @@ class Layer:
 
     def Applied(self):
         self._hasChange = False
+
+    def Changed(self):
+        self._hasChange = True
 
     @staticmethod
     def FromArray(array: np.ndarray, name):
@@ -91,4 +116,3 @@ class Layer:
     @staticmethod
     def Solid(wid, hei, color, name):
         return Layer(wid, hei, color, name)
-

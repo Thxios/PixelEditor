@@ -20,6 +20,7 @@ class MainWindow:
 
     _topTerm = 30
     _left = 250
+    _middle = 50
     _l1 = 250
     _l2 = 400 - _topTerm
     _l3 = 250
@@ -27,10 +28,12 @@ class MainWindow:
     _r2 = 100 - _topTerm
     _bs = 52
 
-    CanvasSection.Setup(_left, _topTerm, w - _left, _r1)
+    # CanvasSection.Setup(_left, _topTerm, w - _left, _r1)
+    CanvasSection.Setup(_left + _middle, _topTerm, w - _left - _middle, _r1)
     PaletteSection.Setup(0, _topTerm, _left - _bs, _l1)
     BrushSection.Setup(_left - _bs, _topTerm, _bs, _l1)
-    FrameSection.Setup(_left, _r1 + _topTerm, w - _left, _r2)
+    # FrameSection.Setup(_left, _r1 + _topTerm, w - _left, _r2)
+    FrameSection.Setup(_left + _middle, _r1 + _topTerm, w - _left - _middle, _r2)
     ColorSection.Setup(0, _l1 + _topTerm, _left, _l2)
     LayerSection.Setup(0, _l1 + _l2 + _topTerm, _left, _l3)
 
@@ -136,14 +139,6 @@ class MainWindow:
                     self.mouseX, self.mouseY,
                     self.mousePreviousX, self.mousePreviousY
                 )
-        # if self.mouseButton[0]:
-        #     if CanvasSection.IsClicked((self.mouseX, self.mouseY)):
-        #         CanvasSection.OnMouseDrag(1, self.mouseX, self.mouseY)
-        # elif self.mouseButton[1]:
-        #     CanvasSection.MoveCanvas(
-        #         round((self.mouseX - self._mousePreviousX) * self.MOVE_SPEED),
-        #         round((self.mouseY - self._mousePreviousY) * self.MOVE_SPEED)
-        #     )
 
 
 MainWindow = MainWindow()
