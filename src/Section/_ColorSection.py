@@ -4,6 +4,7 @@ from src.Brush import Brush
 from src.Color import Color
 from src.Command import Command
 from src.Text import Text
+from src.Interaction import Interaction
 from src import utility
 from math import sin, cos, atan2, degrees, radians, sqrt
 
@@ -53,7 +54,6 @@ class ColorSection(Section):
     def Setup(self, x, y, w, h):
         super().Setup(x, y, w, h)
 
-        self.SetColor()
         self.valueBarRect = pg.Rect((self.w - self.barWidth) // 2,
                                     self.wheelCenterY + self.radius + self.radiusTerm + 13 + 1,
                                     self.barWidth,
@@ -62,6 +62,13 @@ class ColorSection(Section):
                                     self.wheelCenterY + self.radius + self.radiusTerm + 13 + 1 + self.barHeight + 5,
                                     self.barWidth,
                                     self.barHeight)
+
+        if self.color.hsv[V] > 50:
+            self.dotImage = self.dotDarkImage
+        else:
+            self.dotImage = self.dotBrightImage
+        Brush.SetCurrentColor(self.color.rgba)
+        self.Changed()
 
     def Update(self):
         # print(self.w - self.barWidth)
@@ -72,23 +79,25 @@ class ColorSection(Section):
         self.DrawPreview()
         self.DrawText()
 
-    def SetColor(self):
+    def SetColor(self, outer=False):
         if self.color.hsv[V] > 50:
             self.dotImage = self.dotDarkImage
         else:
             self.dotImage = self.dotBrightImage
         Brush.SetCurrentColor(self.color.rgba)
+        if not outer:
+            Interaction.paletteSection.SetColorIndex(-1)
         self.Changed()
 
-    def SetColorRGB(self, r, g, b, a=255):
+    def SetColorRGB(self, r, g, b, a=255, outer=False):
         self.color.rgba = (r, g, b, a)
-        self.SetColor()
+        self.SetColor(outer)
 
-    def SetColorHSV(self, h, s, v):
+    def SetColorHSV(self, h, s, v, outer=False):
         # self.colorHSV = color
         # self.colorRGB = utility.HSV2RGB(color)
         self.color.hsv = (h, s, v)
-        self.SetColor()
+        self.SetColor(outer)
 
     def SetAlpha(self, alpha):
         self.color.alpha = utility.Clamp(alpha, 255, 0)

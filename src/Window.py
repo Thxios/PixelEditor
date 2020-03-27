@@ -1,7 +1,8 @@
 from src.lib import *
-from .Section.Section import *
+from src.Section.Section import *
 from src.Command import Command
 from src.Brush import Brush
+from src.Interaction import Interaction
 
 
 class MainWindow:
@@ -20,7 +21,7 @@ class MainWindow:
 
     _topTerm = 30
     _left = 250
-    _middle = 50
+    _middle = 52
     _l1 = 250
     _l2 = 400 - _topTerm
     _l3 = 250
@@ -30,14 +31,20 @@ class MainWindow:
 
     # CanvasSection.Setup(_left, _topTerm, w - _left, _r1)
     CanvasSection.Setup(_left + _middle, _topTerm, w - _left - _middle, _r1)
-    PaletteSection.Setup(0, _topTerm, _left - _bs, _l1)
-    BrushSection.Setup(_left - _bs, _topTerm, _bs, _l1)
+    # PaletteSection.Setup(0, _topTerm, _left - _bs, _l1)
+    PaletteSection.Setup(0, _topTerm, _left, _l1)
+    # BrushSection.Setup(_left - _bs, _topTerm, _bs, _l1)
+    BrushSection.Setup(_left, _topTerm, _middle, _l1 + _l2 + _l3)
     # FrameSection.Setup(_left, _r1 + _topTerm, w - _left, _r2)
     FrameSection.Setup(_left + _middle, _r1 + _topTerm, w - _left - _middle, _r2)
     ColorSection.Setup(0, _l1 + _topTerm, _left, _l2)
     LayerSection.Setup(0, _l1 + _l2 + _topTerm, _left, _l3)
 
     # ----- for test -----
+    Interaction.Initialize(
+        palette=PaletteSection,
+        color=ColorSection
+    )
     # sprite = Canvas.Empty(20, 15, (0, 0, 0, 255))
 
     mouseButton = [0, 0, 0, 0]

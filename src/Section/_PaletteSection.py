@@ -1,5 +1,6 @@
 from src.lib import *
 from src.Section._Section import Section
+from src.Interaction import Interaction
 from src.Brush import Brush
 
 
@@ -56,8 +57,12 @@ class PaletteSection(Section):
             ))
 
     def SetColorIndex(self, idx):
+        if idx == self.selectedIndex:
+            return
         self.selectedIndex = idx
-        Brush.SetCurrentColor(self.color[idx])
+        if idx != -1:
+            Interaction.colorSection.SetColorRGB(*self.color[idx], outer=True)
+            Brush.SetCurrentColor(self.color[idx])
         self.Changed()
 
     def OnMouseDown(self, button, x, y):
