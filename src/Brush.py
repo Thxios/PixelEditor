@@ -1,5 +1,6 @@
 from src.lib import *
 from src.Layer import Layer
+from src.Interaction import Interaction
 
 
 _pencil = 0
@@ -30,82 +31,26 @@ class _Brush:
 
 
 class _PencilBrush(_Brush):
+    def __init__(self, brush):
+        self.brush = brush
 
-    # ----- for test -----
-    brush = [
-        np.array([
-            [1],
-        ], dtype=np.uint32).T,
-        np.array([
-            [1, 1],
-            [1, 1],
-        ], dtype=np.uint32).T,
-        np.array([
-            [0, 1, 0],
-            [1, 1, 1],
-            [0, 1, 0],
-        ], dtype=np.uint32).T,
-        np.array([
-            [0, 1, 1, 0],
-            [1, 1, 1, 1],
-            [1, 1, 1, 1],
-            [0, 1, 1, 0],
-        ], dtype=np.uint32).T,
-        np.array([
-            [0, 1, 1, 1, 0],
-            [1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1],
-            [0, 1, 1, 1, 0],
-        ], dtype=np.uint32).T,
-    ]
-
-    brushSize = 4
+    def SetBrush(self, brush):
+        self.brush = brush
 
     def OnMouseDown(self, clickedPixel, layer: Layer):
         # layer.SetPixel(*clickedPixel, self.currentColor)
-        layer.BrushDown(*clickedPixel, self.brush[self.brushSize], self.currentColor)
+        layer.BrushDown(*clickedPixel, self.brush, self.currentColor)
 
 
 class _EraserBrush(_Brush):
+    def __init__(self, brush):
+        self.brush = brush
 
-    # ----- for test -----
-    brush = [
-        np.array([
-            [1],
-        ], dtype=np.uint32).T,
-        np.array([
-            [1, 1],
-            [1, 1],
-        ], dtype=np.uint32).T,
-        np.array([
-            [0, 1, 0],
-            [1, 1, 1],
-            [0, 1, 0],
-        ], dtype=np.uint32).T,
-        np.array([
-            [0, 1, 1, 0],
-            [1, 1, 1, 1],
-            [1, 1, 1, 1],
-            [0, 1, 1, 0],
-        ], dtype=np.uint32).T,
-        np.array([
-            [0, 1, 1, 1, 0],
-            [1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1],
-            [0, 1, 1, 1, 0],
-        ], dtype=np.uint32).T,
-    ]
-
-    brushSize = 4
-
+    def SetBrush(self, brush):
+        self.brush = brush
 
     def OnMouseDown(self, clickedPixel, layer: Layer):
-        layer.BrushDown(*clickedPixel, self.brush[self.brushSize], self.currentColor)
-
-    def OnMouseDrag(self, clickedPixel, layer: Layer):
-        layer.SetPixel(*clickedPixel, self.currentColor)
+        layer.BrushDown(*clickedPixel, self.brush, self.currentColor)
 
 
 class _FloodBrush(_Brush):
@@ -122,13 +67,44 @@ class _PickerBrush(_Brush):
 class Brush:
     _layer: Layer
 
-    pencil = _PencilBrush()
-    eraser = _EraserBrush()
-    flood = _FloodBrush()
-    picker = _PickerBrush()
-
     _currentBrush: _Brush
     currentBrushIdx: int
+
+    _maxThickness = 5
+    _brushThickness = 5
+    brushArray = [
+        None,
+        np.array([
+            [1],
+        ], dtype=np.uint32).T,
+        np.array([
+            [1, 1],
+            [1, 1],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 1, 0],
+            [1, 1, 1],
+            [0, 1, 0],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 1, 1, 0],
+            [1, 1, 1, 1],
+            [1, 1, 1, 1],
+            [0, 1, 1, 0],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [0, 1, 1, 1, 0],
+        ], dtype=np.uint32).T,
+    ]
+
+    pencil = _PencilBrush(brushArray[_brushThickness])
+    eraser = _EraserBrush(brushArray[_brushThickness])
+    flood = _FloodBrush()
+    picker = _PickerBrush()
 
     def __init__(self):
         self.SetBrush('Pencil')
@@ -141,10 +117,11 @@ class Brush:
         _pixelX, _pixelY = clickedPixel
         _prePixelX, _prePixelY = previousPixel
         if self.currentBrushIdx == 0 or self.currentBrushIdx == 1:
-            if abs(_prePixelX - _pixelX) > 1 or abs(_prePixelY - _pixelY) > 1:
-                self._DrawLine(*clickedPixel, *previousPixel)
-            else:
-                self._currentBrush.OnMouseDown(clickedPixel, self._layer)
+            if self._layer.visible:
+                if abs(_prePixelX - _pixelX) > 1 or abs(_prePixelY - _pixelY) > 1:
+                    self._DrawLine(*clickedPixel, *previousPixel)
+                else:
+                    self._currentBrush.OnMouseDown(clickedPixel, self._layer)
         else:
             self._currentBrush.OnMouseDrag(clickedPixel, self._layer)
 
@@ -178,8 +155,20 @@ class Brush:
         self.pencil.SetCurrentColor((_r, _g, _b, _a))
         self.flood.SetCurrentColor((_r, _g, _b, _a))
 
-    def GetCurrentBrushIndex(self):
+    def GetCurrentBrushIndex(self) -> int:
         return self.currentBrushIdx
+
+    def GetBrushThickness(self) -> int:
+        return self._brushThickness
+
+    def BrushMagnify(self, value):
+        if 0 < self._brushThickness + value <= self._maxThickness:
+            self._brushThickness += value
+            self.pencil.SetBrush(self.brushArray[self._brushThickness])
+            self.eraser.SetBrush(self.brushArray[self._brushThickness])
+
+            # ----- for test -----
+            Interaction.brushSection.Changed()
 
     # ----- for test -----
     def _DrawLine(self, x0, y0, x1, y1):

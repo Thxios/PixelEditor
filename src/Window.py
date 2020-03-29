@@ -21,27 +21,37 @@ class MainWindow:
 
     _topTerm = 30
     _left = 250
-    _middle = 52
     _l1 = 250
     _l2 = 400 - _topTerm
     _l3 = 250
     _r1 = 800
     _r2 = 100 - _topTerm
     _bs = 52
+    _middle = 130
 
-    # CanvasSection.Setup(_left, _topTerm, w - _left, _r1)
-    CanvasSection.Setup(_left + _middle, _topTerm, w - _left - _middle, _r1)
+    # ORIGINAL
     # PaletteSection.Setup(0, _topTerm, _left - _bs, _l1)
-    PaletteSection.Setup(0, _topTerm, _left, _l1)
+    # CanvasSection.Setup(_left, _topTerm, w - _left, _r1)
     # BrushSection.Setup(_left - _bs, _topTerm, _bs, _l1)
-    BrushSection.Setup(_left, _topTerm, _middle, _l1 + _l2 + _l3)
     # FrameSection.Setup(_left, _r1 + _topTerm, w - _left, _r2)
+
+    # CanvasSection.Setup(_left + _middle, _topTerm, w - _left - _middle, _r1)
+    # PaletteSection.Setup(0, _topTerm, _left, _l1)
+    # BrushSection.Setup(_left, _topTerm, _middle, _l1 + _l2 + _l3)
+    # FrameSection.Setup(_left + _middle, _r1 + _topTerm, w - _left - _middle, _r2)
+
+    PaletteSection.Setup(_left, _topTerm, _middle, _l1 + _l2 + _l3)
+    CanvasSection.Setup(_left + _middle, _topTerm, w - _left - _middle, _r1)
+    BrushSection.Setup(0, _topTerm, _left, _l1)
     FrameSection.Setup(_left + _middle, _r1 + _topTerm, w - _left - _middle, _r2)
+
     ColorSection.Setup(0, _l1 + _topTerm, _left, _l2)
     LayerSection.Setup(0, _l1 + _l2 + _topTerm, _left, _l3)
 
     # ----- for test -----
     Interaction.Initialize(
+        brush=BrushSection,
+        canvas=CanvasSection,
         palette=PaletteSection,
         color=ColorSection
     )

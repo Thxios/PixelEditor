@@ -17,21 +17,37 @@ class BrushSection(Section):
 
     currentBrush = Brush.GetCurrentBrushIndex()
 
+    brushThicknessBG = pg.transform.scale(pg.image.load('data/brushes/brushBG.png'), (60, 60))
+    brushThicknessImage = [None] + [
+        pg.transform.scale(pg.image.load('data/brushes/' + str(i) + '.png'), (60, 60)) for i in range(1, 6)
+    ]
+
     def Setup(self, x, y, w, h):
         super().Setup(x, y, w, h)
         for _brush in range(self.brushCount):
             self.buttonRect.append(
-                pg.Rect(6, 6 + (self.buttonSize + self.buttonTerm) * _brush, self.buttonSize, self.buttonSize)
+                pg.Rect(self.w - 36,
+                        6 + (self.buttonSize + self.buttonTerm) * _brush,
+                        self.buttonSize,
+                        self.buttonSize)
             )
+        # print('brushSection', self.x, self.y, self.w, self.h)
 
     def Update(self):
         self.surface.fill(self.bgColor)
         for _brush in range(self.brushCount):
             if _brush == self.currentBrush:
-                self.surface.blit(self.buttonSelectedImage, (6, 6 + (self.buttonSize + self.buttonTerm) * _brush))
+                # self.surface.blit(self.buttonSelectedImage, (6, 6 + (self.buttonSize + self.buttonTerm) * _brush))
+                self.surface.blit(self.buttonSelectedImage,
+                                  (self.w - 36, 6 + (self.buttonSize + self.buttonTerm) * _brush))
             else:
-                self.surface.blit(self.buttonImage, (6, 6 + (self.buttonSize + self.buttonTerm) * _brush))
-        self.surface.blit(self.buttonIconImage, (0, 0))
+                # self.surface.blit(self.buttonImage, (6, 6 + (self.buttonSize + self.buttonTerm) * _brush))
+                self.surface.blit(self.buttonImage,
+                                  (self.w - 36, 6 + (self.buttonSize + self.buttonTerm) * _brush))
+        self.surface.blit(self.buttonIconImage, (self.w - 42, 0))
+
+        self.surface.blit(self.brushThicknessBG, (20, 160))
+        self.surface.blit(self.brushThicknessImage[Brush.GetBrushThickness()], (20, 160))
 
     def OnMouseDown(self, button, x, y):
         x, y = self.LocalPosition((x, y))

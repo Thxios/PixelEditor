@@ -90,6 +90,9 @@ class Sprite:
         self._currentLayer = idx
         Brush.SetCurrentLayer(self.CurrentFrame().GetLayer(idx))
 
+    def GetLayer(self, idx) -> Layer:
+        return self._frame[self._currentFrame].GetLayer(idx)
+
     def CurrentFrame(self) -> Frame:
         return self._frame[self._currentFrame]
 
@@ -100,7 +103,10 @@ class Sprite:
         return self._frameCount
 
     def LayerCount(self) -> int:
-        return self.CurrentFrame().LayerCount()
+        return self._frame[self._currentFrame].LayerCount()
+
+    def LayerVisible(self, idx) -> bool:
+        return self._frame[self._currentFrame].GetLayer(idx).visible
 
     def SetFrame(self, idx):
         if idx < 0 or idx > self._frameCount:

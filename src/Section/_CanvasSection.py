@@ -31,7 +31,6 @@ class CanvasSection(Section):
     # ----- for test -----
     limit = 20
     cursorColor = (60, 63, 65)
-    brushSize = 5
 
     def Setup(self, x, y, w, h):
         super().Setup(x, y, w, h)
@@ -42,7 +41,7 @@ class CanvasSection(Section):
             self.Update()
             self._hasChange = False
         _surface = self.surface.copy()
-        self.DrawCursor(_surface, )
+        self.DrawCursor(_surface)
         screen.blit(_surface, (self.x, self.y))
         pg.display.update(pg.draw.rect(screen, self._outlineColor, self.rect, 3))
 
@@ -104,8 +103,8 @@ class CanvasSection(Section):
     def DrawCursor(self, surface):
         _mouseX, _mouseY = pg.mouse.get_pos()
         if self.IsClicked((_mouseX, _mouseY)):
-            pg.draw.circle(surface, self.cursorColor,
-                           self.LocalPosition((_mouseX, _mouseY)), self.magnification * self.brushSize // 2, 1)
+            pg.draw.circle(surface, self.cursorColor, self.LocalPosition((_mouseX, _mouseY)),
+                           self.magnification * Brush.GetBrushThickness() // 2, 1)
 
     def DisplayArea(self):
         _xs, _xe = max(0, self.canvas.x), min(self.w, self.canvas.x + self.canvas.w)
@@ -164,12 +163,12 @@ class CanvasSection(Section):
             #     self.Changed()
         elif button == 4:
             if Command.GetKey(pg.K_LCTRL):
-                pass
+                Brush.BrushMagnify(1)
             else:
                 self.Magnify(1, (x, y))
         elif button == 5:
             if Command.GetKey(pg.K_LCTRL):
-                pass
+                Brush.BrushMagnify(-1)
             else:
                 self.Magnify(-1, (x, y))
 
