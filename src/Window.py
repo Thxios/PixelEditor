@@ -2,6 +2,7 @@ from src.lib import *
 from src.Section.Section import *
 from src.Command import Command
 from src.Brush import Brush
+from src.FileIO import FileIO
 from src.Interaction import Interaction
 
 
@@ -16,8 +17,6 @@ class MainWindow:
     screen = None
     clock = pg.time.Clock()
     fps = 126
-
-    Brush.SetBrush('Pencil')
 
     _topTerm = 30
     _left = 250
@@ -51,6 +50,7 @@ class MainWindow:
     # ----- for test -----
     Interaction.Initialize(
         brush=BrushSection,
+        layer=LayerSection,
         canvas=CanvasSection,
         palette=PaletteSection,
         color=ColorSection
@@ -62,6 +62,8 @@ class MainWindow:
     mouseX, mouseY = 0, 0
     mousePreviousX, mousePreviousY = 0, 0
     currentSection = None
+
+    Brush.SetBrush('Pencil')
 
     def Run(self):
         pg.init()
@@ -147,6 +149,21 @@ class MainWindow:
             if event.button < len(self.mouseButton):
                 self.mouseButton[event.button] = 0
             self.currentSection.OnMouseUp(event.button, self.mouseX, self.mouseY)
+
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_s:
+                if Command.GetKey(pg.K_LCTRL):
+                    FileIO.Save()
+
+            elif event.key == pg.K_o:
+                if Command.GetKey(pg.K_LCTRL):
+                    FileIO.Open()
+
+            # ----- for test -----
+            elif event.key == pg.K_q:
+                Brush.SetBrush(0)
+            elif event.key == pg.K_w:
+                Brush.SetBrush(1)
 
     def LateFeedback(self):
         for _button in range(1, self.mouseButtonCount):

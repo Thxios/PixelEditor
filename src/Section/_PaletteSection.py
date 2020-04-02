@@ -16,7 +16,7 @@ class PaletteSection(Section):
     colorCount = 0
     colorRect: List[pg.Rect] = []
 
-    selectedIndex = 1
+    selectedIndex = -1
     selectedBoxColor = (255, 255, 0, 127)
 
     # ----- for test -----
@@ -63,6 +63,7 @@ class PaletteSection(Section):
         if idx != -1:
             Interaction.colorSection.SetColorRGB(*self.color[idx], outer=True)
             Brush.SetCurrentColor(self.color[idx])
+            Brush.SetBrush(0)
         self.Changed()
 
     def OnMouseDown(self, button, x, y):

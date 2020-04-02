@@ -140,6 +140,10 @@ class CanvasSection(Section):
         # pg.quit()
         # quit()
 
+    def SpriteUpdate(self):
+        self.SetupCanvas()
+        self.Changed()
+
     def PositionToPixel(self, x, y) -> (int, int, bool):
         if self.canvas.collidepoint(x, y):
             _valid = True

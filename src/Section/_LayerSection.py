@@ -12,18 +12,21 @@ class LayerSection(Section):
     # ----- for test -----
     rectTerm: int = 10
     verticalTerm: int = 2
-    leftTerm: int = 20
+    leftTerm: int = 24
     layerRectHeight: int = 30
     layerRect: List[pg.Rect] = []
     visibleButtonRect: List[pg.Rect] = []
+    removeButtonRect: List[pg.Rect] = []
     layerName: List[str] = Sprite.CurrentFrame().GetLayerName()
 
     layerColor: (int, int, int) = (60, 63, 65)
     selectedColor: (int, int, int) = (75, 110, 175)
-    buttonColor = (96, 98, 99)
+    buttonColor = (255, 255, 255)
+    # buttonColor = (96, 98, 99)
 
     visibleIconImage = pg.image.load('data/visibleIcon.png')
     invisibleIconImage = pg.image.load('data/invisibleIcon.png')
+    removeIconImage = pg.image.load('data/removeIcon.png')
 
     def Setup(self, x, y, w, h):
         super().Setup(x, y, w, h)
@@ -40,16 +43,30 @@ class LayerSection(Section):
                 pg.draw.rect(self.surface,
                              self.selectedColor,
                              rect.inflate(-2 * self.verticalTerm, -2 * self.verticalTerm))
-            pg.draw.rect(self.surface, self.buttonColor, self.visibleButtonRect[i], 1)
+            # pg.draw.rect(self.surface, self.buttonColor, self.visibleButtonRect[i], 1)
+            # pg.draw.rect(self.surface, self.buttonColor, self.removeButtonRect[i], 1)
             # pg.draw.rect(self.surface, self.buttonColor, (rect.right - 4 - 22, rect.top + 4, 22, 22), 1)
             # pg.draw.rect(self.surface, self.buttonColor, (rect.right - 5 - 22, rect.top + 3, 24, 24), 1)
             if Sprite.LayerVisible(i):
                 self.surface.blit(self.visibleIconImage, self.visibleButtonRect[i].topleft)
             else:
                 self.surface.blit(self.invisibleIconImage, self.visibleButtonRect[i].topleft)
+            # self.surface.blit(self.removeIconImage, self.removeButtonRect[i].topleft)
             Text.LeftAligned(self.layerName[i], self.surface, rect, term=10)
 
+    def SpriteUpdate(self):
+        self.layerCount = Sprite.LayerCount()
+        self.layerName = Sprite.CurrentFrame().GetLayerName()
+        self.selectedLayer = Sprite.CurrentLayerIndex()
+        self.MakeRect()
+        self.Changed()
+        Sprite.CurrentLayer().Changed()
+        Interaction.canvasSection.Changed()
+
     def MakeRect(self):
+        self.layerRect = []
+        self.visibleButtonRect = []
+        self.removeButtonRect = []
         for i in range(self.layerCount):
             _rect = pg.Rect(
                 self.rectTerm,
@@ -58,6 +75,12 @@ class LayerSection(Section):
                 self.layerRectHeight
             )
             self.layerRect.append(_rect)
+            # self.removeButtonRect.append(pg.Rect(
+            #     _rect.right - 4 - 22 - 2 - 22,
+            #     _rect.top + 4,
+            #     22,
+            #     22
+            # ))
             self.visibleButtonRect.append(pg.Rect(
                 _rect.right - 4 - 22,
                 _rect.top + 4,
@@ -81,6 +104,10 @@ class LayerSection(Section):
                         Sprite.GetLayer(i).visible = not Sprite.GetLayer(i).visible
                         Sprite.CurrentLayer().Changed()
                         Interaction.canvasSection.Changed()
+                    elif self.removeButtonRect[i].collidepoint(x, y):
+                        if Sprite.LayerCount() > 1:
+                            Sprite.DeleteLayer(i)
+                            self.SpriteUpdate()
                     else:
                         Sprite.SetCurrentLayer(i)
                         self.selectedLayer = i

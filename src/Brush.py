@@ -70,7 +70,7 @@ class Brush:
     _currentBrush: _Brush
     currentBrushIdx: int
 
-    _maxThickness = 5
+    maxThickness = 7
     _brushThickness = 5
     brushArray = [
         None,
@@ -99,6 +99,23 @@ class Brush:
             [1, 1, 1, 1, 1],
             [0, 1, 1, 1, 0],
         ], dtype=np.uint32).T,
+        np.array([
+            [0, 0, 1, 1, 0, 0],
+            [0, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1],
+            [0, 1, 1, 1, 1, 0],
+            [0, 0, 1, 1, 0, 0],
+        ], dtype=np.uint32).T,
+        np.array([
+            [0, 0, 1, 1, 1, 0, 0],
+            [0, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+            [0, 1, 1, 1, 1, 1, 0],
+            [0, 0, 1, 1, 1, 0, 0],
+        ], dtype=np.uint32).T,
     ]
 
     pencil = _PencilBrush(brushArray[_brushThickness])
@@ -107,7 +124,8 @@ class Brush:
     picker = _PickerBrush()
 
     def __init__(self):
-        self.SetBrush('Pencil')
+        self._currentBrush = self.pencil
+        self.currentBrushIdx = 0
 
     def OnMouseDown(self, clickedPixel):
         # self._currentBrush.OnMouseDown(clickedPixel, self._layer)
@@ -141,6 +159,7 @@ class Brush:
         elif brush == 'Picker' or brush == _picker:
             self._currentBrush = self.picker
             self.currentBrushIdx = 3
+        Interaction.brushSection.Changed()
 
     def SetCurrentLayer(self, layer: Layer):
         self._layer = layer
@@ -162,7 +181,7 @@ class Brush:
         return self._brushThickness
 
     def BrushMagnify(self, value):
-        if 0 < self._brushThickness + value <= self._maxThickness:
+        if 0 < self._brushThickness + value <= self.maxThickness:
             self._brushThickness += value
             self.pencil.SetBrush(self.brushArray[self._brushThickness])
             self.eraser.SetBrush(self.brushArray[self._brushThickness])

@@ -15,11 +15,12 @@ class BrushSection(Section):
 
     brushCount = 7
 
-    currentBrush = Brush.GetCurrentBrushIndex()
+    # currentBrush = Brush.GetCurrentBrushIndex()
 
     brushThicknessBG = pg.transform.scale(pg.image.load('data/brushes/brushBG.png'), (60, 60))
     brushThicknessImage = [None] + [
-        pg.transform.scale(pg.image.load('data/brushes/' + str(i) + '.png'), (60, 60)) for i in range(1, 6)
+        pg.transform.scale(pg.image.load('data/brushes/' + str(i) + '.png'), (60, 60))
+        for i in range(1, Brush.maxThickness + 1)
     ]
 
     def Setup(self, x, y, w, h):
@@ -36,7 +37,7 @@ class BrushSection(Section):
     def Update(self):
         self.surface.fill(self.bgColor)
         for _brush in range(self.brushCount):
-            if _brush == self.currentBrush:
+            if _brush == Brush.currentBrushIdx:
                 # self.surface.blit(self.buttonSelectedImage, (6, 6 + (self.buttonSize + self.buttonTerm) * _brush))
                 self.surface.blit(self.buttonSelectedImage,
                                   (self.w - 36, 6 + (self.buttonSize + self.buttonTerm) * _brush))
@@ -53,7 +54,7 @@ class BrushSection(Section):
         x, y = self.LocalPosition((x, y))
         for _brush, _button in enumerate(self.buttonRect):
             if _button.collidepoint(x, y):
-                self.currentBrush = _brush
+                # self.currentBrush = _brush
                 Brush.SetBrush(_brush)
                 self.Changed()
                 break

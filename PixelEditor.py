@@ -50,6 +50,7 @@ def MakeNewSurface(width, height):
     return pg.Surface((width, height), SRCALPHA)
 
 
+dataPath = 'pre_data/'
 
 pg.init()
 pg.display.set_caption('Pixel Editor v1.0')
@@ -106,7 +107,7 @@ moveStart_x, moveStart_y = 0, 0
 
 palette = []
 def LoadPalette():
-    with open('data/palette.txt') as f:
+    with open(dataPath + 'palette.txt') as f:
         lines = f.readlines()
 
     for c in lines:
@@ -122,19 +123,19 @@ brushThickness = 0
 bSize = (0, 1, 2, 4, 7)
 
 
-UI_RGBAFont = pg.image.load('data/FontRGBA.png')
-UI_SlideBar = pg.image.load('data/SlideBar.png')
+UI_RGBAFont = pg.image.load(dataPath + 'FontRGBA.png')
+UI_SlideBar = pg.image.load(dataPath + 'SlideBar.png')
 
-penCursor = pg.image.load('data/PenCursor.png')
-pickerCursor = pg.image.load('data/PickerCursor.png')
-floodCursor = pg.image.load('data/FloodFillCursor.png')
-selectCursor = pg.image.load('data/SelectCursor.png')
-moveCursor = pg.image.load('data/MoveCursor.png')
+penCursor = pg.image.load(dataPath + 'PenCursor.png')
+pickerCursor = pg.image.load(dataPath + 'PickerCursor.png')
+floodCursor = pg.image.load(dataPath + 'FloodFillCursor.png')
+selectCursor = pg.image.load(dataPath + 'SelectCursor.png')
+moveCursor = pg.image.load(dataPath + 'MoveCursor.png')
 
-bgImage = pg.image.load('data/TransparentBG.png')
-brushImage = pg.image.load('data/BrushIcon.png')
-brushDisabledImage = pg.image.load('data/BrushIcon_disabled.png')
-ThicknessImage = pg.image.load('data/Thickness.png')
+bgImage = pg.image.load(dataPath + 'TransparentBG.png')
+brushImage = pg.image.load(dataPath + 'BrushIcon.png')
+brushDisabledImage = pg.image.load(dataPath + 'BrushIcon_disabled.png')
+ThicknessImage = pg.image.load(dataPath + 'Thickness.png')
 
 font = pg.font.SysFont('Consolas', 11)
 

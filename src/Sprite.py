@@ -1,6 +1,7 @@
 from src.lib import *
 from src.Layer import Layer
 from src.Brush import Brush
+from src.Interaction import Interaction
 
 
 class Frame:
@@ -99,6 +100,9 @@ class Sprite:
     def CurrentLayer(self) -> Layer:
         return self._frame[self._currentFrame].GetLayer(self._currentLayer)
 
+    def CurrentLayerIndex(self) -> int:
+        return self._currentLayer
+
     def FrameCount(self) -> int:
         return self._frameCount
 
@@ -122,6 +126,14 @@ class Sprite:
         self._currentLayer = idx
         Brush.SetCurrentLayer(self.CurrentLayer())
 
+    def DeleteLayer(self, idx):
+        print(idx)
+        if self._frame[self._currentFrame].LayerCount() > 1:
+            if idx == self._currentLayer:
+                if self._currentLayer == self._frame[self._currentFrame].LayerCount() - 1:
+                    self.SetLayer(idx - 1)
+            self._frame[self._currentFrame].DeleteLayer(idx)
+
     @staticmethod
     def Empty(wid, hei, frameCount=1):
         _sprite = Sprite(wid, hei)
@@ -129,9 +141,30 @@ class Sprite:
             _sprite.AddFrame(Frame.Empty(wid, hei))
         return _sprite
 
+    def FromSurface(self, surface: pg.Surface, name=None, in_place=False):
+        _w, _h = surface.get_size()
+        _frame = Frame(_w, _h)
+        if name is None:
+            _frame.AddLayer(Layer.FromSurface(surface, 'Layer 0'))
+        else:
+            _frame.AddLayer(Layer.FromSurface(surface, name))
+        if in_place:
+            self.w, self.h = _w, _h
+            self._frame = [_frame]
+            self._frameCount = 1
+            self._currentFrame = 0
+            self._currentLayer = 0
+            Interaction.layerSection.SpriteUpdate()
+            Interaction.canvasSection.SpriteUpdate()
+            Brush.SetCurrentLayer(self.CurrentLayer())
+        else:
+            _sprite = Sprite(_w, _h)
+            _sprite.AddFrame(_frame)
+            return _sprite
 
-Sprite = Sprite.Empty(64, 64)
+
+Sprite = Sprite.Empty(32, 32)
 Sprite.CurrentFrame().AddLayerEmpty()
 Sprite.CurrentFrame().AddLayerEmpty()
-Sprite.CurrentFrame().AddLayerEmpty()
+# Sprite.CurrentFrame().AddLayerEmpty()
 
